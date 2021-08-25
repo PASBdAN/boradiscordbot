@@ -21,3 +21,7 @@ Obs: Supondo que já tem o heroku cli instalado
  - Fazer login: heroku login (vai abrir uma página no navegador para realizar o login)
  - Listar os apps instalados: heroku apps
  - Listar os dynos (VMs que rodam a aplicação) disponíveis para o app: heroku ps -a <nome do app>
+
+### Startando um dyno do app para deixar o serviço/script rodando:
+ 
+ - heroku ps:scale worker=1 -a <nome do app>
