@@ -11,8 +11,8 @@ Obs: após criar o app pelo site do heroku:
 ### Arquivos necessários para fazer o deploy do app no heroku:
 
  - requirements.txt (lista com os pacotes do script python, criar com o comando pip freeze > requirements.txt)
- - Procfile (arquivo de configuração do dyno, para o nosso caso só terá a linha "worker: python <nome do script pra rodar>")
- - <nome do script>.py (o próprio script que deve ser rodado)
+ - Procfile (arquivo de configuração do dyno, para o nosso caso só terá a linha: worker: python **nome do script**)
+ - **nome do script**.py (o próprio script que deve ser rodado)
 
 ## Consultando e manipulando os aplicativos no heroku pelo CLI:
 
@@ -20,8 +20,8 @@ Obs: Supondo que já tem o heroku cli instalado
 
  - Fazer login: heroku login (vai abrir uma página no navegador para realizar o login)
  - Listar os apps instalados: heroku apps
- - Listar os dynos (VMs que rodam a aplicação) disponíveis para o app: heroku ps -a <nome do app>
+ - Listar os dynos (VMs que rodam a aplicação) disponíveis para o app: heroku ps -a **nome do app**
 
 ### Startando um dyno do app para deixar o serviço/script rodando:
  
- - heroku ps:scale worker=1 -a <nome do app>
+ - heroku ps:scale worker=1 -a **nome do app**
