@@ -32,4 +32,4 @@ async def pairs(ctx, role: discord.Role):
         i += 2
     await ctx.send(output)
 
-bot.run('LKzaWwEJpMgnX_36qJbSfmGdA_5LkH4m')
+bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE')
