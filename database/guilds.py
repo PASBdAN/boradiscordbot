@@ -1,5 +1,5 @@
 import sqlite3
-from database.helper import Client
+from database.client import Client
 
 class UsersDB(Client):
     def __init__(self,db_name):
@@ -9,5 +9,6 @@ class UsersDB(Client):
         with open(schema_file, 'r') as f:
             schema = f.read()
             self.db.cursor.executescript(schema)
+        self.close_db()
     
     

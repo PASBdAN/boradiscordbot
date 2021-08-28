@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS guilds (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     guild TEXT,
-    guildId INTEGER,
+    guildId INTEGER UNIQUE,
     channels JSON,
     textChannels JSON,
     channelsCategory JSON,
