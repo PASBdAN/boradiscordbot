@@ -1,7 +1,5 @@
 import sqlite3
 
-conn = sqlite3.connect('database/test.db')
-
 class Client():
     def __init__(self, db_name):
         try:
@@ -9,7 +7,7 @@ class Client():
             self.cursor = self.conn.cursor()
         except sqlite3.Error as e:
             print(f"Falha ao abrir o banco: {e}")
-    
+
     def commit_db(self):
         if self.conn:
             self.conn.commit()

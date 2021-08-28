@@ -1,1 +1,1 @@
-worker: python cupido_uwu.py
+worker: python main.py
