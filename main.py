@@ -57,16 +57,5 @@ for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
 
-@bot.command()
-async def pairs(ctx, role: discord.Role):
-    nomes = [x.mention for x in role.members]
-    random.shuffle(nomes)
-    output = "Os casais são:"
-    i = 0
-    while i <= len(nomes)-2:
-        output += f"\n{nomes[i]} \U00002764 {nomes[i+1]}"
-        i += 2
-    await ctx.send(output)
-
-bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE') # DEPLOY
-# bot.run('ODYzNTIxODIzMjYyMzc1OTk4.YOoHXg.C-jh4M8sg4SJRv-wYSRkdUA4plg') # TEST
+# bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE') # DEPLOY
+bot.run('ODYzNTIxODIzMjYyMzc1OTk4.YOoHXg.C-jh4M8sg4SJRv-wYSRkdUA4plg') # TEST
