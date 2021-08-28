@@ -68,5 +68,5 @@ async def pairs(ctx, role: discord.Role):
         i += 2
     await ctx.send(output)
 
-# bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE')
-bot.run('ODYzNTIxODIzMjYyMzc1OTk4.YOoHXg.C-jh4M8sg4SJRv-wYSRkdUA4plg')
+bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE') # DEPLOY
+# bot.run('ODYzNTIxODIzMjYyMzc1OTk4.YOoHXg.C-jh4M8sg4SJRv-wYSRkdUA4plg') # TEST
