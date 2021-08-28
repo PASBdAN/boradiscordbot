@@ -6,6 +6,7 @@ class Prefixes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # EVENT LISTENERS
     @commands.Cog.listener()
     async def on_ready(self):
         print('Módulo de prefixos pronto!')
@@ -26,10 +27,20 @@ class Prefixes(commands.Cog):
         guilds.delete_guild(guild.id)
         guilds.close_db()
 
-    @commands.command()
+    #TASKS
+
+    # COMMANDS
+    @commands.command(
+        brief=f'Ex: $prefix !',
+        description='Troca o prefixo dos comandos do bot.')
     async def prefix(self, ctx, prefix):
         guilds = Guilds()
-        guilds.update_guild_prefix(ctx.guild.id,prefix)
+        # guilds.update_guild_prefix(ctx.guild.id,prefix)
+        prefix_db = guilds.get_guild_prefix(ctx.guild.id)
+        if prefix_db:
+            guilds.update_guild_prefix(ctx.guild.id,prefix)
+        else:
+            guilds.insert_guild_prefix(ctx.guild.id, prefix)
         guilds.close_db()
         message = f'O prefixo de comandos do bot agora é {prefix}'
         await ctx.send(message)

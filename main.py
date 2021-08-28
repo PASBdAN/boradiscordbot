@@ -18,31 +18,34 @@ intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix=get_prefix,intents=intents)
 
-@bot.command()
-async def load(ctx, extension):
+@bot.command(brief=f'Ex: $load Prefixes',
+        description='Carrega o módulo especificado.')
+async def load(ctx, extension:str):
     try:
-        bot.load_extension(f'cogs.{extension}')
+        bot.load_extension(f'cogs.{extension.lower()}')
         message = f"Módulo {extension} carregado com sucesso"
         await ctx.send(message)
     except Exception as e:
         message = f"Não foi possível carregar o módulo {extension}:\n{e}"
         await ctx.send(message)
 
-@bot.command()
-async def unload(ctx, extension):
+@bot.command(brief=f'Ex: $unload Prefixes',
+        description='Desativa o módulo especificado.')
+async def unload(ctx, extension:str):
     message = ""
     try:
-        bot.unload_extension(f'cogs.{extension}')
+        bot.unload_extension(f'cogs.{extension.lower()}')
         message = f"Módulo {extension} desativado com sucesso!"
         await ctx.send(message)
     except Exception as e:
         message = f"Não foi possível desativar o módulo {extension}:\n{e}"
         await ctx.send(message)
 
-@bot.command()
-async def reload(ctx, extension):
+@bot.command(brief=f'Ex: $reload Prefixes',
+        description='Restarta o módulo especificado.')
+async def reload(ctx, extension:str):
     try:
-        bot.unload_extension(f'cogs.{extension}')
+        bot.unload_extension(f'cogs.{extension.lower()}')
         bot.load_extension(f'cogs.{extension}')
         message = f"Módulo {extension} reiniciado com sucesso!"
         await ctx.send(message)
@@ -65,4 +68,5 @@ async def pairs(ctx, role: discord.Role):
         i += 2
     await ctx.send(output)
 
-bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE')
+# bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE')
+bot.run('ODYzNTIxODIzMjYyMzc1OTk4.YOoHXg.C-jh4M8sg4SJRv-wYSRkdUA4plg')
