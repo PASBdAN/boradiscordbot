@@ -54,8 +54,8 @@ async def reload(ctx, extension:str):
         await ctx.send(message)
 
 for filename in os.listdir('./cogs'):
-    if filename.endswith('.py') and not filename.startswith('activitystatus'):
+    if filename.endswith('.py') and not filename.startswith('activitystatus') and not filename.startswith('prefixes'):
         bot.load_extension(f'cogs.{filename[:-3]}')
 
-bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE') # DEPLOY
-# bot.run('ODYzNTIxODIzMjYyMzc1OTk4.YOoHXg.C-jh4M8sg4SJRv-wYSRkdUA4plg') # TEST
+# bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE') # DEPLOY
+bot.run('ODYzNTIxODIzMjYyMzc1OTk4.YOoHXg.C-jh4M8sg4SJRv-wYSRkdUA4plg') # TEST
