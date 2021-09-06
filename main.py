@@ -20,6 +20,7 @@ bot = commands.Bot(command_prefix=get_prefix,intents=intents)
 
 @bot.command(brief=f'Ex: $load Prefixes',
         description='Carrega o módulo especificado.')
+@commands.has_any_role("Chefes do Role","Mestre do Role","teste alo","PseudoPiranha")
 async def load(ctx, extension:str):
     try:
         bot.load_extension(f'cogs.{extension.lower()}')
@@ -31,6 +32,7 @@ async def load(ctx, extension:str):
 
 @bot.command(brief=f'Ex: $unload Prefixes',
         description='Desativa o módulo especificado.')
+@commands.has_any_role("Chefes do Role","Mestre do Role","teste alo","PseudoPiranha")
 async def unload(ctx, extension:str):
     message = ""
     try:
@@ -43,6 +45,7 @@ async def unload(ctx, extension:str):
 
 @bot.command(brief=f'Ex: $reload Prefixes',
         description='Restarta o módulo especificado.')
+@commands.has_any_role("Chefes do Role","Mestre do Role","teste alo","PseudoPiranha")
 async def reload(ctx, extension:str):
     try:
         bot.unload_extension(f'cogs.{extension.lower()}')
