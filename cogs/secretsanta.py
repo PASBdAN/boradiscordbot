@@ -15,6 +15,7 @@ class SecretSanta(commands.Cog):
     # COMMANDS
     @commands.command(brief=f'Ex: $secret @everyone',
         description='Manda um DM para cada membro da role, especificando seu amigo secreto.')
+    @commands.has_any_role(["CHEFES DO ROLE","MESTRE DO ROLE","teste alo","PseudoPiranha"])
     async def secret(self, ctx, role: discord.Role):
         nomes = list(role.members)
         random.shuffle(nomes)

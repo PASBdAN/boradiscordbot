@@ -14,6 +14,7 @@ class DateFake(commands.Cog):
     # COMMANDS
     @commands.command(brief=f'Ex: $pairs @everyone',
         description='Gera pares aleatórios dos membros com o cargo especificado.')
+    @commands.has_any_role(["CHEFES DO ROLE","MESTRE DO ROLE","teste alo","PseudoPiranha"])
     async def pairs(self, ctx, role: discord.Role):
         nomes = [x.mention for x in role.members]
         random.shuffle(nomes)
