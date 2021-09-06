@@ -22,7 +22,7 @@ class SecretSanta(commands.Cog):
         nomes.append(nomes[0])
         for user in nomes[1:]:
             name = user.nick if user.nick else user.name
-            message = f"Seu amigo secreto é {amigo_secreto[1]}, AKA {amigo_secreto[0]}.\nComando executado por {ctx.author} no dia {datetime.strftime(datetime.now(),'%d/%m/%Y as %H:%M:%S')}"
+            message = f"Seu amigo secreto é {amigo_secreto[1]}, AKA {amigo_secreto[0]}.\nComando executado por {ctx.author} no dia {datetime.strftime(datetime.now(),'%d/%m/%Y as %H:%M:%S (GMT +0)')}"
             amigo_secreto = (name, f"{user.name}#{user.discriminator}")
             try:
                 await user.send(message)
