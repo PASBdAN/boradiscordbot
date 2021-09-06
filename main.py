@@ -8,7 +8,7 @@ from database.guilds import Guilds
 def get_prefix(bot, message):
     server_prefix = []
     guilds = Guilds()
-    server_prefix = guilds.get_guild_prefix(message.guild.id)
+    server_prefix = guilds.get_guild_value(message.guild.id,'prefix')
     if server_prefix:
         return server_prefix[0]
     else:
@@ -46,7 +46,7 @@ async def unload(ctx, extension:str):
 async def reload(ctx, extension:str):
     try:
         bot.unload_extension(f'cogs.{extension.lower()}')
-        bot.load_extension(f'cogs.{extension}')
+        bot.load_extension(f'cogs.{extension.lower()}')
         message = f"Módulo {extension} reiniciado com sucesso!"
         await ctx.send(message)
     except Exception as e:
@@ -54,7 +54,7 @@ async def reload(ctx, extension:str):
         await ctx.send(message)
 
 for filename in os.listdir('./cogs'):
-    if filename.endswith('.py'):
+    if filename.endswith('.py') and not filename.startswith('activitystatus'):
         bot.load_extension(f'cogs.{filename[:-3]}')
 
 bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE') # DEPLOY

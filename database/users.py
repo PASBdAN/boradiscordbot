@@ -1,7 +1,7 @@
 import sqlite3
 from database.client import Client
 
-class UsersDB(Client):
+class Users(Client):
     def __init__(self,db_name = "bot.db"):
         super().__init__(db_name)
         self.tb_name = "users"

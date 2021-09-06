@@ -9,27 +9,27 @@ class Guilds(Client):
         with open(self.schema_file, 'r') as f:
             schema = f.read()
             self.cursor.executescript(schema)
-
-    def get_guild_prefix(self, guild_id):
+    
+    def get_guild_value(self, guild_id, column):
         self.cursor.execute(f"""
-            SELECT prefix FROM {self.tb_name} WHERE guild_id = ?
+            SELECT {column} FROM {self.tb_name} WHERE guild_id = ?
         """, (guild_id,))
         return self.cursor.fetchone()
     
-    def insert_guild_prefix(self, guild_id, prefix):
+    def insert_guild_value(self, guild_id, value, column):
         self.cursor.execute(f"""
-            INSERT INTO {self.tb_name} (guild_id, prefix)
+            INSERT INTO {self.tb_name} (guild_id, {column})
             VALUES(?,?)
-        """,(guild_id,prefix,))
+        """,(guild_id,value,))
         self.commit_db()
 
-    def update_guild_prefix(self, guild_id, prefix):
+    def update_guild_value(self, guild_id, value, column):
         self.cursor.execute(f"""
-            UPDATE {self.tb_name} SET prefix = ?
+            UPDATE {self.tb_name} SET {column} = ?
             WHERE guild_id = ?
-        """,(prefix, guild_id,))
+        """,(value, guild_id,))
         self.commit_db()
-    
+
     def delete_guild(self, guild_id):
         self.cursor.execute(f"""
             DELETE FROM {self.tb_name} WHERE guild_id = ?

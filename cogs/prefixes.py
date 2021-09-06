@@ -14,11 +14,11 @@ class Prefixes(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         guilds = Guilds()
-        prefix = guilds.get_guild_prefix(guild.id)
+        prefix = guilds.get_guild_value(guild.id,'prefix')
         if prefix:
-            guilds.update_guild_prefix(guild.id,'$')
+            guilds.update_guild_value(guild.id,'$','prefix')
         else:
-            guilds.insert_guild_prefix(guild.id, '$')
+            guilds.insert_guild_value(guild.id, '$','prefix')
         guilds.close_db()
 
     @commands.Cog.listener()
@@ -36,11 +36,11 @@ class Prefixes(commands.Cog):
     async def prefix(self, ctx, prefix):
         guilds = Guilds()
         # guilds.update_guild_prefix(ctx.guild.id,prefix)
-        prefix_db = guilds.get_guild_prefix(ctx.guild.id)
+        prefix_db = guilds.get_guild_value(ctx.guild.id,'prefix')
         if prefix_db:
-            guilds.update_guild_prefix(ctx.guild.id,prefix)
+            guilds.update_guild_value(ctx.guild.id,prefix,'prefix')
         else:
-            guilds.insert_guild_prefix(ctx.guild.id, prefix)
+            guilds.insert_guild_value(ctx.guild.id, prefix,'prefix')
         guilds.close_db()
         message = f'O prefixo de comandos do bot agora é {prefix}'
         await ctx.send(message)
