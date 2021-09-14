@@ -34,7 +34,7 @@ class Guilds(Client):
             sql.SQL("INSERT INTO {table} ({fields}) VALUES (%s, %s)").format(
                 table=sql.Identifier(self.tb_name),
                 fields=sql.SQL(', ').join(map(sql.Identifier,['guild_id',column]))
-            ),(guild_id,column,)
+            ),(guild_id,value,)
         )
         # placeholders=sql.SQL(', ').join(sql.Placeholder()*2))
         self.commit_db()
