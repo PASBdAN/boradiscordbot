@@ -3,7 +3,7 @@ import psycopg2
 import os
 
 class Client():
-    def __init__(self, db_name):
+    def __init__(self):
         # self.conn = sqlite3.connect(db_name)
         self.conn = psycopg2.connect(os.environ['DATABASE_URL'])
         self.cursor = self.conn.cursor()

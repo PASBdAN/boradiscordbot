@@ -3,8 +3,8 @@ from database.client import Client
 from psycopg2 import sql
 
 class Guilds(Client):
-    def __init__(self,db_name = "database/bot.db"):
-        super().__init__(db_name)
+    def __init__(self):
+        super().__init__()
         self.tb_name = "guilds"
         self.schema_file = 'database/schemas/guilds_schema.sql'
         with open(self.schema_file, 'r') as f:
