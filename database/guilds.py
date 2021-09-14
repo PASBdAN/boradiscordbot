@@ -31,10 +31,12 @@ class Guilds(Client):
         #     VALUES(?,?)
         # """,(guild_id,value,))
         self.cursor.execute(
-            sql.SQL("INSERT INTO {table} ({fields}) values ({placeholders})").format(
-                fields=sql.SQL(', ').join(map(sql.Identifier,['guild_id',column])),
-                placeholders=sql.SQL(', ').join(sql.Placeholder()*2))
+            sql.SQL("INSERT INTO {table} ({fields}) VALUES (%s, %s)").format(
+                table=sql.Identifier(self.tb_name),
+                fields=sql.SQL(', ').join(map(sql.Identifier,['guild_id',column]))
             ),(guild_id,column,)
+        )
+        # placeholders=sql.SQL(', ').join(sql.Placeholder()*2))
         self.commit_db()
 
     def update_guild_value(self, guild_id, value, column):
@@ -58,7 +60,7 @@ class Guilds(Client):
         self.cursor.execute(
             sql.SQL("DELETE FROM {table} WHERE {pkey} = %s").format(
                 table=sql.Identifier(self.tb_name),
-                pkay=sql.Identifier('guild_id'),
+                pkey=sql.Identifier('guild_id'),
             ), (guild_id,)
         )
         self.commit_db()
