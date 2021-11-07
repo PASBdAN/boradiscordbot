@@ -19,6 +19,7 @@ class VrChat(commands.Cog):
     @commands.command(
         brief=f'Ex: $search_world "Bar do Zé"',
         description='Lista os mundos e seus IDs dado um nome de pesquisa')
+    @commands.has_any_role("Chefes do Role","Mestre do Role","Tester","PseudoPiranha","Piranha")
     async def search_world(self, ctx, world_name):
         output = ""
         for world in self.vrchat_bot.get_worlds(world_name):
@@ -28,6 +29,7 @@ class VrChat(commands.Cog):
     @commands.command(
         brief=f'Ex: $send_friend_request Flakesu Ciri♥ Tarado',
         description="Envie um friend request do bot para os usuários especificados")
+    @commands.has_any_role("Chefes do Role","Mestre do Role","Tester","PseudoPiranha","Piranha")
     async def send_friend_request(self, ctx, *args):
         for user in args:
             usuario = self.vrchat_bot.send_friend_request(user)
@@ -39,6 +41,7 @@ class VrChat(commands.Cog):
     @commands.command(
         brief=f'Ex: $invite_users Friends+ 69024 Flakesu Ciri♥ Tarado',
         description="Cria uma instância do 1's Optimized Box")
+    @commands.has_any_role("Chefes do Role","Mestre do Role","Tester","PseudoPiranha","Piranha")
     async def optimized_box(self, ctx, *args):
         for user in args[2:]:
             usuario = self.vrchat_bot.invite_user(
@@ -55,6 +58,7 @@ class VrChat(commands.Cog):
     @commands.command(
         brief=f'Ex: $invite_users Public 37452 Flakesu Ciri♥ Tarado',
         description="Cria uma instância do Bar do Zé Brasil 3 OFFICIAL")
+    @commands.has_any_role("Chefes do Role","Mestre do Role","Tester","PseudoPiranha","Piranha")
     async def bar_do_ze_3(self, ctx, *args):
         for user in args[2:]:
             usuario = self.vrchat_bot.invite_user(
