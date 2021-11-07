@@ -39,22 +39,22 @@ class VrChat(commands.Cog):
                 await ctx.send(f"Houve um erro no ao enviar friend request ao usuário {user}")
 
     @commands.command(
-        brief=f'Ex: $invite_users Friends+ 69024 Flakesu Ciri♥ Tarado',
-        description="Cria uma instância do 1's Optimized Box")
+        brief=f'Ex: $invite_users wrld_e5c30b56-efa8-42d5-a8d4-a2cca2bf3403 Friends+ 69024 Flakesu Ciri♥ Tarado',
+        description="Cria uma instância do mundo com o worldId especificado")
     @commands.has_any_role("Chefes do Role","Mestre do Role","Tester","PseudoPiranha","Piranha")
-    async def optimized_box(self, ctx, *args):
+    async def invite_users(self, ctx, *args):
         for user in args[2:]:
             usuario = self.vrchat_bot.invite_user(
-                "wrld_1a8b8684-3b19-4770-a4a7-288762f57b29",
-                args[1],
-                args[0].lower(),
+                args[0],
+                args[2],
+                args[1].lower(),
                 "us",
                 user)
             if usuario:
                 await ctx.send(f"O usuário {usuario} foi convidado!")
             else:
                 await ctx.send(f"Houve um erro ao convidar o usuário {user}")
-    
+    '''
     @commands.command(
         brief=f'Ex: $invite_users Public 37452 Flakesu Ciri♥ Tarado',
         description="Cria uma instância do Bar do Zé Brasil 3 OFFICIAL")
@@ -71,7 +71,7 @@ class VrChat(commands.Cog):
                 await ctx.send(f"O usuário {usuario} foi convidado!")
             else:
                 await ctx.send(f"Houve um erro ao convidar o usuário {user}")
-        
+    '''        
 
 def setup(bot):
     bot.add_cog(VrChat(bot))
