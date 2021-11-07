@@ -5,6 +5,8 @@ import os
 import random
 from database.guilds import Guilds
 
+# from config.config import BOT_KEY_TEST
+
 def get_prefix(bot, message):
     server_prefix = []
     guilds = Guilds()
@@ -60,5 +62,5 @@ for filename in os.listdir('./cogs'):
     if filename.endswith('.py') and not filename.startswith('activitystatus'):
         bot.load_extension(f'cogs.{filename[:-3]}')
 
-bot.run('ODUxNTg1MDAwNTAzOTAyMjE4.YL6aVQ.4tzJbf6OAftDJ8MmJO435sjmuNE') # DEPLOY
-# bot.run('ODYzNTIxODIzMjYyMzc1OTk4.YOoHXg.C-jh4M8sg4SJRv-wYSRkdUA4plg') # TEST
+bot.run(os.environ['BOT_KEY']) # DEPLOY
+# bot.run(BOT_KEY_TEST) # TEST
