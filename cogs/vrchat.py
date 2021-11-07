@@ -39,15 +39,15 @@ class VrChat(commands.Cog):
                 await ctx.send(f"Houve um erro no ao enviar friend request ao usuário {user}")
 
     @commands.command(
-        brief=f'Ex: $invite_users <worldId> Friends+ 69024 Flakesu Ciri♥ Tarado',
+        brief=f'Ex: $invite_users <worldId> 69024 Friends+ Flakesu Ciri♥ Tarado',
         description="Cria uma instância do mundo com o worldId especificado. O primeiro argumento é o worldId do mundo que você quer criar a instância, sugiro conseguir ele com o comando $search_world. O segundo argumento é o modo da sala (public, friends, invite+, etc). O terceiro argumento é o id da instância do mundo. Os argumentos seguintes são nomes de usuários do VRChat.")
     @commands.has_any_role("Chefes do Role","Mestre do Role","Tester","PseudoPiranha","Piranha")
     async def invite_users(self, ctx, *args):
-        for user in args[2:]:
+        for user in args[3:]:
             usuario = self.vrchat_bot.invite_user(
                 args[0],
-                args[2],
-                args[1].lower(),
+                args[1],
+                args[2].lower(),
                 "us",
                 user)
             if usuario:
