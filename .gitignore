@@ -130,4 +130,4 @@ dmypy.json
 
 # Auth and Config stuff
 
-.config/
+config/
