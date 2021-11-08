@@ -1,5 +1,7 @@
 import discord
 from discord.ext import commands
+from discord import Embed
+from discord.utils import get
 from vrchat.bot import Bot
 
 class VrChat(commands.Cog):
@@ -21,10 +23,17 @@ class VrChat(commands.Cog):
         description='Lista os mundos e seus IDs dado um nome de pesquisa')
     @commands.has_any_role("Chefes do Role","Mestre do Role","Tester","PseudoPiranha","Piranha")
     async def search_world(self, ctx, world_name):
-        output = ""
-        for world in self.vrchat_bot.get_worlds(world_name):
-            output += f"\nNOME: {world.name}\n ID: {world.id}\n"
-        await ctx.send(output)
+        for world in self.vrchat_bot.get_worlds(world_name)[:5]:
+            embed = Embed(title=world.name)
+            fields = [("Autor",world.author_name, True),
+                    ("Capacidade", world.capacity, True),
+                    ("Favoritos", world.favorites, True),
+                    ("World ID", world.id, False),]
+            for name, value, inline in fields:
+                embed.add_field(name=name, value=value, inline=inline)
+            embed.set_thumbnail(url=world.thumbnail_image_url)
+            embed.colour = 0xff66cc
+            await ctx.send(embed=embed)
 
     @commands.command(
         brief=f'Ex: $send_friend_request Flakesu Ciri♥ Tarado',
