@@ -15,6 +15,26 @@ class VrChat(commands.Cog):
     async def on_ready(self):
         print('Módulo de VRChat pronto!')
 
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        channel = reaction.message.channel
+        try:
+            if user != self.bot.user and reaction.message.embeds[0].description == "vrchat_world" and reaction.emoji == "⬆️":
+                embed = Embed(title='Deseja criar uma instância para esse mundo?')
+                embed.set_thumbnail(url = reaction.message.embeds[0].thumbnail.url)
+                embed.description = reaction.message.embeds[0].title
+                msg = await channel.send(embed=embed)
+                await msg.add_reaction("✅")
+                await msg.add_reaction("❌")
+            elif user != self.bot.user and reaction.message.embeds[0].title == 'Deseja criar uma instância para esse mundo?':
+                if reaction.emoji == "✅":
+                    await channel.send(f'Bom saber, agora espera ae kk')
+                elif reaction.emoji == "❌":
+                    await channel.send(f'Poxa vida :(')
+        except IndexError:
+            pass
+        # await channel.send(f'{user.name} usou o reaction {reaction.emoji} na mensagem {reaction.message.content}')
+
     # TASKS
     
     # COMMANDS
@@ -33,7 +53,9 @@ class VrChat(commands.Cog):
                 embed.add_field(name=name, value=value, inline=inline)
             embed.set_thumbnail(url=world.thumbnail_image_url)
             embed.colour = 0xff66cc
-            await ctx.send(embed=embed)
+            embed.description = "vrchat_world"
+            msg = await ctx.send(embed=embed)
+            # await msg.add_reaction("⬆️")
 
     @commands.command(
         brief=f'Ex: $send_friend_request Flakesu Ciri♥ Tarado',
