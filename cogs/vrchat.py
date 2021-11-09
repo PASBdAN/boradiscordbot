@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import Embed
 from discord.utils import get
 from vrchat.bot import Bot
+import asyncio
 
 class VrChat(commands.Cog):
     def __init__(self, bot):
@@ -32,8 +33,8 @@ class VrChat(commands.Cog):
         brief=f'Ex: $search_worlds "Bar do Zé"',
         description='Retorna uma embed message interagível por reactions dos mundos retornados na pesquisa')
     @commands.has_any_role("Chefes do Role","Mestre do Role","Tester","PseudoPiranha","Piranha")
-    async def search_worlds(self, ctx, world_name):
-        print(world_name)
+    async def search_worlds(self, ctx, *args):
+        world_name = ' '.join(args)
         worlds = self.vrchat_bot.get_worlds(world_name)
         i = 0
         msg = await ctx.send(embed = self.create_embed(worlds[i].name,[
@@ -51,7 +52,7 @@ class VrChat(commands.Cog):
         await msg.add_reaction(join)
         def check(reaction, user):
             return user == ctx.author and str(
-                reaction.emoji) in [left, right, join]
+                reaction.emoji) in [left, right, join] and reaction.message == msg
         while True:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=10.0, check=check)
@@ -81,7 +82,7 @@ class VrChat(commands.Cog):
                         0xff66cc,f"{i+1}/{len(worlds)}"))
                 if str(reaction.emoji) == join:
                     await ctx.send('FEATURE NOT READY YET')
-            except Exception as e:
+            except asyncio.TimeoutError:
                 break
 
     @commands.command(
@@ -112,6 +113,6 @@ class VrChat(commands.Cog):
                 await ctx.send(f"O usuário {usuario} foi convidado!")
             else:
                 await ctx.send(f"Houve um erro ao convidar o usuário {user}")
-                
+
 def setup(bot):
     bot.add_cog(VrChat(bot))
