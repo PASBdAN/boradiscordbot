@@ -10,52 +10,79 @@ class VrChat(commands.Cog):
         self.vrchat_bot = Bot()
         self.vrchat_bot.open_api()
 
+    def create_embed(self, title:str, fields:list, image, colour, footer = ''):
+        embed = Embed(title=title)
+        fields = fields
+        for name, value, inline in fields:
+            embed.add_field(name=name, value=value, inline=inline)
+        embed.set_image(url=image)
+        embed.colour = colour
+        embed.set_footer(text = footer)
+        return embed
+    
     # EVENT LISTENERS
     @commands.Cog.listener()
     async def on_ready(self):
         print('Módulo de VRChat pronto!')
 
-    @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
-        channel = reaction.message.channel
-        try:
-            if user != self.bot.user and reaction.message.embeds[0].description == "vrchat_world" and reaction.emoji == "⬆️":
-                embed = Embed(title='Deseja criar uma instância para esse mundo?')
-                embed.set_thumbnail(url = reaction.message.embeds[0].thumbnail.url)
-                embed.description = reaction.message.embeds[0].title
-                msg = await channel.send(embed=embed)
-                await msg.add_reaction("✅")
-                await msg.add_reaction("❌")
-            elif user != self.bot.user and reaction.message.embeds[0].title == 'Deseja criar uma instância para esse mundo?':
-                if reaction.emoji == "✅":
-                    await channel.send(f'Bom saber, agora espera ae kk')
-                elif reaction.emoji == "❌":
-                    await channel.send(f'Poxa vida :(')
-        except IndexError:
-            pass
-        # await channel.send(f'{user.name} usou o reaction {reaction.emoji} na mensagem {reaction.message.content}')
-
     # TASKS
     
     # COMMANDS
     @commands.command(
-        brief=f'Ex: $search_world "Bar do Zé"',
-        description='Lista os mundos e seus IDs dado um nome de pesquisa')
+        brief=f'Ex: $search_worlds "Bar do Zé"',
+        description='Retorna uma embed message interagível por reactions dos mundos retornados na pesquisa')
     @commands.has_any_role("Chefes do Role","Mestre do Role","Tester","PseudoPiranha","Piranha")
-    async def search_world(self, ctx, world_name):
-        for world in self.vrchat_bot.get_worlds(world_name)[:5]:
-            embed = Embed(title=world.name)
-            fields = [("Autor",world.author_name, True),
-                    ("Capacidade", world.capacity, True),
-                    ("Favoritos", world.favorites, True),
-                    ("World ID", world.id, False),]
-            for name, value, inline in fields:
-                embed.add_field(name=name, value=value, inline=inline)
-            embed.set_thumbnail(url=world.thumbnail_image_url)
-            embed.colour = 0xff66cc
-            embed.description = "vrchat_world"
-            msg = await ctx.send(embed=embed)
-            # await msg.add_reaction("⬆️")
+    async def search_worlds(self, ctx, world_name):
+        print(world_name)
+        worlds = self.vrchat_bot.get_worlds(world_name)
+        i = 0
+        msg = await ctx.send(embed = self.create_embed(worlds[i].name,[
+            ("Autor",worlds[i].author_name,True),
+            ("Capacidade",worlds[i].capacity,True),
+            ("Favoritos",worlds[i].favorites,True),
+            ("World ID",worlds[i].id,False)],
+            worlds[i].image_url,
+            0xff66cc,f"{i+1}/{len(worlds)}"))
+        left = "⬅️"
+        right = "➡️"
+        join =  "☑️"
+        await msg.add_reaction(left)
+        await msg.add_reaction(right)
+        await msg.add_reaction(join)
+        def check(reaction, user):
+            return user == ctx.author and str(
+                reaction.emoji) in [left, right, join]
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=10.0, check=check)
+                if str(reaction.emoji) == left:
+                    if i == 0:
+                        i = len(worlds) - 1
+                    else:
+                        i -= 1
+                    await msg.edit(embed=self.create_embed(worlds[i].name,[
+                        ("Autor",worlds[i].author_name,True),
+                        ("Capacidade",worlds[i].capacity,True),
+                        ("Favoritos",worlds[i].favorites,True),
+                        ("World ID",worlds[i].id,False)],
+                        worlds[i].image_url,
+                        0xff66cc,f"{i+1}/{len(worlds)}"))
+                if str(reaction.emoji) == right:
+                    if i == len(worlds) - 1:
+                        i = 0
+                    else:
+                        i += 1
+                    await msg.edit(embed=self.create_embed(worlds[i].name,[
+                        ("Autor",worlds[i].author_name,True),
+                        ("Capacidade",worlds[i].capacity,True),
+                        ("Favoritos",worlds[i].favorites,True),
+                        ("World ID",worlds[i].id,False)],
+                        worlds[i].image_url,
+                        0xff66cc,f"{i+1}/{len(worlds)}"))
+                if str(reaction.emoji) == join:
+                    await ctx.send('FEATURE NOT READY YET')
+            except Exception as e:
+                break
 
     @commands.command(
         brief=f'Ex: $send_friend_request Flakesu Ciri♥ Tarado',
@@ -85,24 +112,6 @@ class VrChat(commands.Cog):
                 await ctx.send(f"O usuário {usuario} foi convidado!")
             else:
                 await ctx.send(f"Houve um erro ao convidar o usuário {user}")
-    '''
-    @commands.command(
-        brief=f'Ex: $invite_users Public 37452 Flakesu Ciri♥ Tarado',
-        description="Cria uma instância do Bar do Zé Brasil 3 OFFICIAL")
-    @commands.has_any_role("Chefes do Role","Mestre do Role","Tester","PseudoPiranha","Piranha")
-    async def bar_do_ze_3(self, ctx, *args):
-        for user in args[2:]:
-            usuario = self.vrchat_bot.invite_user(
-                "wrld_3036938d-689f-47f8-a224-ab67b5059723",
-                args[1],
-                args[0].lower(),
-                "us",
-                user)
-            if usuario:
-                await ctx.send(f"O usuário {usuario} foi convidado!")
-            else:
-                await ctx.send(f"Houve um erro ao convidar o usuário {user}")
-    '''        
-
+                
 def setup(bot):
     bot.add_cog(VrChat(bot))
