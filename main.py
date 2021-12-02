@@ -10,16 +10,18 @@ from database.guilds import Guilds
 def get_prefix(bot, message):
     server_prefix = []
     guilds = Guilds()
-    server_prefix = guilds.get_guild_value(message.guild.id,'prefix')
-    if server_prefix:
-        return server_prefix[0]
-    else:
+    try:
+        server_prefix = guilds.get_guild_value(message.guild.id,'prefix')
+        if server_prefix:
+            return server_prefix[0]
+        else:
+            return '$'
+    except:
         return '$'
 
 intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix=get_prefix,intents=intents)
-
 @bot.command(brief=f'Ex: $load Prefixes',
         description='Carrega o módulo especificado.')
 @commands.has_any_role("Chefes do Role","Mestre do Role","teste alo","PseudoPiranha")
