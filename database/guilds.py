@@ -20,7 +20,7 @@ class Guilds(Client):
             sql.SQL("SELECT {field} FROM {table} WHERE {pkey} = %s").format(
                 field=sql.Identifier(column),
                 table=sql.Identifier(self.tb_name),
-                pkey=sql.Identifier('guild_id')
+                pkey=sql.Identifier('id')
                 ), (guild_id,)
             )
         return self.cursor.fetchone()
@@ -33,7 +33,7 @@ class Guilds(Client):
         self.cursor.execute(
             sql.SQL("INSERT INTO {table} ({fields}) VALUES (%s, %s)").format(
                 table=sql.Identifier(self.tb_name),
-                fields=sql.SQL(', ').join(map(sql.Identifier,['guild_id',column]))
+                fields=sql.SQL(', ').join(map(sql.Identifier,['id',column]))
             ),(guild_id,value,)
         )
         # placeholders=sql.SQL(', ').join(sql.Placeholder()*2))
@@ -48,7 +48,7 @@ class Guilds(Client):
             sql.SQL("UPDATE {table} SET {field} = %s WHERE {pkey} = %s").format(
                 table=sql.Identifier(self.tb_name),
                 field=sql.Identifier(column),
-                pkay=sql.Identifier('guild_id'),
+                pkey=sql.Identifier('id'),
             ), (value,guild_id,)
         )
         self.commit_db()
@@ -60,7 +60,7 @@ class Guilds(Client):
         self.cursor.execute(
             sql.SQL("DELETE FROM {table} WHERE {pkey} = %s").format(
                 table=sql.Identifier(self.tb_name),
-                pkey=sql.Identifier('guild_id'),
+                pkey=sql.Identifier('id'),
             ), (guild_id,)
         )
         self.commit_db()

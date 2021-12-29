@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user TEXT,
-    user_id BIGINT UNIQUE,
+    id INTEGER PRIMARY KEY,
+    name TEXT,
     nickname TEXT,
 );
