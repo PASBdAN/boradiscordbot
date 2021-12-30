@@ -56,7 +56,7 @@ class Main(commands.Cog):
         brief=f'Ex: $prefix !',
         description='Troca o prefixo dos comandos do bot.')
     @commands.is_owner()
-    @commands.has_permissions(administrator=True, manage_guild=True)
+    @commands.has_permissions(manage_guild=True)
     async def _prefix(self, ctx, prefix):
         msg = await ctx.send(f'Deseja mesmo atualizar o prefixo para < {prefix} > ?')
         accept =  "✅"
@@ -90,7 +90,7 @@ class Main(commands.Cog):
         brief=f'Ex: $set_activity_timer 5',
         description='Define o intervalo em segundos entre os status de atividade do bot.')
     @commands.is_owner()
-    @commands.has_permissions(administrator=True, manage_guild=True)
+    @commands.has_permissions(manage_guild=True)
     async def set_activity_timer(self, ctx, time: int):
         self.change_status.change_interval(seconds = time)
         self.change_status.restart()
@@ -102,7 +102,7 @@ class Main(commands.Cog):
         brief=f'Ex: $set_activity_list A1, A2, A3',
         description='Define uma lista de status de atividade do bot para serem mostrados em um loop')
     @commands.is_owner()
-    @commands.has_permissions(administrator=True, manage_guild=True)
+    @commands.has_permissions(manage_guild=True)
     async def set_activity_list(self, ctx, *args):
         string = ' '.join(args)
         self.status_list = cycle([x.strip() for x in string.split(",")])
