@@ -48,11 +48,16 @@ class Main(commands.Cog):
     async def change_status(self):
         await self.bot.change_presence(activity=discord.Game(next(self.status_list)))
 
+
     # COMMANDS
+
     @commands.command(
+        name="prefix",
         brief=f'Ex: $prefix !',
         description='Troca o prefixo dos comandos do bot.')
-    async def prefix(self, ctx, prefix):
+    @commands.is_owner()
+    @has_permissions(administrator=True, manage_server=True)
+    async def _prefix(self, ctx, prefix):
         msg = await ctx.send(f'Deseja mesmo atualizar o prefixo para < {prefix} > ?')
         accept =  "✅"
         decline = "❌"
@@ -80,18 +85,24 @@ class Main(commands.Cog):
             message = f'Ocorreu um erro ao processar o comando :('
             await ctx.send(message)
     
+
     @commands.command(
         brief=f'Ex: $set_activity_timer 5',
         description='Define o intervalo em segundos entre os status de atividade do bot.')
+    @commands.is_owner()
+    @has_permissions(administrator=True, manage_server=True)
     async def set_activity_timer(self, ctx, time: int):
         self.change_status.change_interval(seconds = time)
         self.change_status.restart()
         message = f'Atividade do bot mudará a cada {time} segundos!'
         await ctx.send(message)
     
+
     @commands.command(
         brief=f'Ex: $set_activity_list A1, A2, A3',
         description='Define uma lista de status de atividade do bot para serem mostrados em um loop')
+    @commands.is_owner()
+    @has_permissions(administrator=True, manage_server=True)
     async def set_activity_list(self, ctx, *args):
         string = ' '.join(args)
         self.status_list = cycle([x.strip() for x in string.split(",")])
