@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands, has_permissions
+from discord.ext import commands
 import random
 from datetime import datetime
 
@@ -22,7 +22,7 @@ class Events(commands.Cog):
     @commands.command(brief=f'Ex: $pairs @everyone',
         description='Gera pares aleatórios dos membros com o cargo especificado.')
     @commands.is_owner()
-    @has_permissions(administrator=True, manage_server=True)
+    @commands.has_permissions(administrator=True, manage_server=True)
     async def pairs(self, ctx, role: discord.Role):
         nomes = [x.mention for x in role.members]
         random.shuffle(nomes)
@@ -37,7 +37,7 @@ class Events(commands.Cog):
     @commands.command(brief=f'Ex: $secret @everyone',
         description='Manda um DM para cada membro da role, especificando seu amigo secreto.')
     @commands.is_owner()
-    @has_permissions(administrator=True, manage_server=True)
+    @commands.has_permissions(administrator=True, manage_server=True)
     async def secret(self, ctx, role: discord.Role):
         nomes = list(role.members)
         random.shuffle(nomes)
