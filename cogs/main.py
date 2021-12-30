@@ -1,16 +1,19 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord import Embed
 from database.guilds import Guilds
+from itertools import cycle
 
-class Prefixes(commands.Cog):
+class Main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.status_list = cycle(["ERPing with Flakesu", "ERPing with Erediin", "ERPing with Castell"])
 
     # EVENT LISTENERS
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Módulo de prefixos pronto!')
+        self.change_status.start()
+        print('Módulo Main pronto!')
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
@@ -29,6 +32,9 @@ class Prefixes(commands.Cog):
         guilds.close_db()
 
     #TASKS
+    @tasks.loop(seconds = 60)
+    async def change_status(self):
+        await self.bot.change_presence(activity=discord.Game(next(self.status_list)))
 
     # COMMANDS
     @commands.command(
@@ -61,6 +67,25 @@ class Prefixes(commands.Cog):
         except:
             message = f'Ocorreu um erro ao processar o comando :('
             await ctx.send(message)
+    
+    @commands.command(
+        brief=f'Ex: $set_activity_timer 5',
+        description='Define o intervalo em segundos entre os status de atividade do bot.')
+    async def set_activity_timer(self, ctx, time: int):
+        self.change_status.change_interval(seconds = time)
+        self.change_status.restart()
+        message = f'Atividade do bot mudará a cada {time} segundos!'
+        await ctx.send(message)
+    
+    @commands.command(
+        brief=f'Ex: $set_activity_list A1, A2, A3',
+        description='Define uma lista de status de atividade do bot para serem mostrados em um loop')
+    async def set_activity_list(self, ctx, *args):
+        string = ' '.join(args)
+        self.status_list = cycle([x.strip() for x in string.split(",")])
+        self.change_status.restart()
+        message = f'Lista de atividades do bot atualizada com sucesso!'
+        await ctx.send(message)
 
 def setup(bot):
-    bot.add_cog(Prefixes(bot))
+    bot.add_cog(Main(bot))
