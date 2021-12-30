@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, has_permissions
 from discord import Embed
 from discord.utils import get
 from vrchat.bot import Bot
@@ -28,7 +28,7 @@ class VrChat(commands.Cog):
 
     # TASKS
     
-    
+
     # COMMANDS
 
     @commands.command(

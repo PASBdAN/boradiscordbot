@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, has_permissions
 import random
 from datetime import datetime
 

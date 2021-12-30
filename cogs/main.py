@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands, tasks, has_permissions
 from discord import Embed
 from database.guilds import Guilds
 from itertools import cycle
