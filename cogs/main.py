@@ -3,11 +3,23 @@ from discord.ext import commands, tasks
 from discord import Embed
 from database.guilds import Guilds
 from itertools import cycle
+import random
 
 class Main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.status_list = cycle(["ERPing with Flakesu", "ERPing with Erediin", "ERPing with Castell"])
+        self.funny_people = ["Flakesu","Erediin","Tarado","Ciri","Castell","Reninha","InsaneCat",
+    "Anezaki","ThePearl","Shizu","Bubbles","Kalmorph","SirT","JulieVR","Miami","Tag",
+    "Cautelosa","Coisinha","Biscate"]
+        self.funny_emoji = ["😍","😳","😈","😏","🤫","💋","❤️","👀"]
+        random.shuffle(self.funny_people)
+        random.shuffle(self.funny_emoji)
+        self.status_list = cycle(
+            [f"ERPing with {x[0]} {x[1]}" for x in 
+            list(zip(self.funny_people, cycle(self.funny_emoji))
+                if len(self.funny_people) > len(self.funny_emoji)
+                else zip(cycle(self.funny_people), self.funny_emoji))]
+            )
 
     # EVENT LISTENERS
     @commands.Cog.listener()
