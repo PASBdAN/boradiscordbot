@@ -34,7 +34,6 @@ class VrChat(commands.Cog):
     @commands.command(
         brief=f'Ex: $search_worlds "Bar do Zé"',
         description='Retorna uma embed message interagível por reactions dos mundos retornados na pesquisa')
-    @commands.is_owner()
     @commands.has_permissions(manage_guild=True)
     async def search_worlds(self, ctx, *args):
         world_name = ' '.join(args)
@@ -92,7 +91,6 @@ class VrChat(commands.Cog):
     @commands.command(
         brief=f'Ex: $send_friend_request Flakesu Ciri♥ Tarado',
         description="Envie um friend request do bot para os usuários especificados")
-    @commands.is_owner()
     @commands.has_permissions(manage_guild=True)
     async def send_friend_request(self, ctx, *args):
         for user in args:
@@ -106,7 +104,6 @@ class VrChat(commands.Cog):
     @commands.command(
         brief=f'Ex: $invite_users <worldId> 69024 Friends+ Flakesu Ciri♥ Tarado',
         description="Cria uma instância do mundo com o worldId especificado. O primeiro argumento é o worldId do mundo que você quer criar a instância, sugiro conseguir ele com o comando $search_world. O segundo argumento é o modo da sala (public, friends, invite+, etc). O terceiro argumento é o id da instância do mundo. Os argumentos seguintes são nomes de usuários do VRChat.")
-    @commands.is_owner()
     @commands.has_permissions(manage_guild=True)
     async def invite_users(self, ctx, *args):
         for user in args[3:]:
