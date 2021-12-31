@@ -117,17 +117,16 @@ class Main(commands.Cog):
     async def dbsync(self, ctx):
         users = Users()
         nomes_update = ""
-        nomes = ""
+        # nomes = ""
         nomes_insert = ""
         for member in ctx.guild.members:
-            name = users.get_user_value(member.id,'name')
-            if name and name != member.name:
-                if name != member.name:
-                    print(f"{name} /// {member.name}")
+            name = users.get_user_value(member.id,'name') # RETORNA UMA TUPLA
+            if name:
+                if name[0] != member.name:
                     users.update_user_value(member.id,member.name,'name')
                     nomes_update += f" {member.name}"
-                else:
-                    nomes += f" {name}"
+                # else:
+                #     nomes += f" {name}"
             else:
                 users.insert_user_value(member.id, member.name,'name')
                 nomes_insert += f" {member.name}"
@@ -135,8 +134,8 @@ class Main(commands.Cog):
         await ctx.send(message)
         message = f'Membros atualizados no banco: {nomes_update}'
         await ctx.send(message)
-        message = f'Membros inalterados no banco: {nomes}'
-        await ctx.send(message)
+        # message = f'Membros inalterados no banco: {nomes}'
+        # await ctx.send(message)
         users.close_db()
 
     
