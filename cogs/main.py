@@ -116,12 +116,20 @@ class Main(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def dbsync(self, ctx):
         users = Users()
+        nomes_update = ""
+        nomes_insert = ""
         for member in ctx.guild.members:
             name = users.get_user_value(member.id,'name')
             if name or name != member.name:
                 users.update_user_value(member.id,member.name,'name')
+                nomes_update = nomes_update + f" {member.name}"
             else:
                 users.insert_user_value(member.id, member.name,'name')
+                nomes_insert = nomes_insert + f" {member.name}"
+        message = f'Membros inseridos no banco: {nomes_insert}'
+        await ctx.send(message)
+        message = f'Membros atualizados no banco: {nomes_update}'
+        await ctx.send(message)
         users.close_db()
 
     
