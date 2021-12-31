@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     name TEXT,
-    nickname TEXT,
+    nickname TEXT
 );

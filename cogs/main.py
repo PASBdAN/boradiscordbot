@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands, tasks
 from discord import Embed
 from database.guilds import Guilds
+from database.users import Users
 from itertools import cycle
 import random
 
@@ -106,6 +107,38 @@ class Main(commands.Cog):
         self.change_status.restart()
         message = f'Lista de atividades do bot atualizada com sucesso!'
         await ctx.send(message)
+
+
+    @commands.command(
+        name='dbsync',
+        brief=f'Ex: $dbsync',
+        description='Pega todas as informações relevantes do servidor e seus membros e salva no banco')
+    @commands.has_permissions(administrator=True)
+    async def dbsync(self, ctx):
+        users = Users()
+        for member in ctx.guild.members:
+            name = users.get_user_value(member.id,'name')
+            if name or name != member.name:
+                users.update_user_value(member.id,member.name,'name')
+            else:
+                users.insert_user_value(member.id, member.name,'name')
+        users.close_db()
+
+    
+    @commands.command(
+        name='user',
+        brief=f'Ex: $user @crush',
+        description='Verifica se o usuário está registrado no banco')
+    @commands.has_permissions(manage_guild=True)
+    async def get_user(self, ctx, member: discord.Member):
+        users = Users()
+        name = users.get_user_value(member.id,'name')
+        if name:
+            message = f'O usuário {member.nick} está registrado no banco!'
+        else:
+            message = f'O usuário não foi encontrado no banco.'
+        await ctx.send(message)
+        
 
 def setup(bot):
     bot.add_cog(Main(bot))
