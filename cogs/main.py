@@ -117,18 +117,25 @@ class Main(commands.Cog):
     async def dbsync(self, ctx):
         users = Users()
         nomes_update = ""
+        nomes = ""
         nomes_insert = ""
         for member in ctx.guild.members:
             name = users.get_user_value(member.id,'name')
-            if name or name != member.name:
-                users.update_user_value(member.id,member.name,'name')
-                nomes_update = nomes_update + f" {member.name}"
+            if name and name != member.name:
+                if name != member.name:
+                    print(f"{name} /// {member.name}")
+                    users.update_user_value(member.id,member.name,'name')
+                    nomes_update += f" {member.name}"
+                else:
+                    nomes += f" {name}"
             else:
                 users.insert_user_value(member.id, member.name,'name')
-                nomes_insert = nomes_insert + f" {member.name}"
+                nomes_insert += f" {member.name}"
         message = f'Membros inseridos no banco: {nomes_insert}'
         await ctx.send(message)
         message = f'Membros atualizados no banco: {nomes_update}'
+        await ctx.send(message)
+        message = f'Membros inalterados no banco: {nomes}'
         await ctx.send(message)
         users.close_db()
 
@@ -144,7 +151,7 @@ class Main(commands.Cog):
         if name:
             message = f'O usuário {member.nick} está registrado no banco!'
         else:
-            message = f'O usuário não foi encontrado no banco.'
+            message = f'O usuário {member.name}, AKA {member.nick} não foi encontrado no banco. ID: {member.id}'
         await ctx.send(message)
         
 
