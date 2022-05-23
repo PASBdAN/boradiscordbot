@@ -15,7 +15,7 @@ class DevelopmentConfig(ABC):
     try:
         from local_secrets import secret_dict
     except ImportError:
-        secret_dict = {x:None for x in ["CONFIG_NAME","VRCHAT_AUTH","NOUCE","BOT_KEY","DISCORD_KEY","DATABASE_LOCAL"]}
+        secret_dict = {x:None for x in ["CONFIG_NAME","VRCHAT_AUTH","NOUNCE","BOT_KEY","DISCORD_KEY","DATABASE_LOCAL"]}
     VRCHAT_AUTH = secret_dict["VRCHAT_AUTH"]
     NOUNCE = secret_dict["NOUNCE"]
     BOT_KEY = secret_dict["BOT_KEY"]
