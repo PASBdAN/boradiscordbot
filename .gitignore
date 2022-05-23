@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 # Auth and Config stuff
-
-config/
+config
+local_secrets.py

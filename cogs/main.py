@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from discord import Embed
+# from discord import Embed
 from database.guilds import Guilds
 from database.users import Users
 from itertools import cycle
@@ -9,9 +9,13 @@ import random
 class Main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.funny_people = ["Flakesu","Erediin","Tarado","Ciri","Castell","Reninha","InsaneCat",
-    "Anezaki","ThePearl","Shizu","Bubbles","Kalmorph","SirT","JulieVR","Miami","Tag",
-    "Cautelosa","Coisinha","Biscate"]
+
+    # EVENT LISTENERS
+    @commands.Cog.listener()
+    async def on_ready(self):
+        users = Users()
+        user_list = [await self.bot.fetch_user(int(y[0])) for y in users.get_all_users_values('id')]
+        self.funny_people = [x.display_name for x in user_list]
         self.funny_emoji = ["😍","😳","😈","😏","🤫","💋","❤️","👀"]
         random.shuffle(self.funny_people)
         random.shuffle(self.funny_emoji)
@@ -21,10 +25,6 @@ class Main(commands.Cog):
                 if len(self.funny_people) > len(self.funny_emoji)
                 else zip(cycle(self.funny_people), self.funny_emoji))]
             )
-
-    # EVENT LISTENERS
-    @commands.Cog.listener()
-    async def on_ready(self):
         self.change_status.start()
         print('Módulo Main pronto!')
 
@@ -45,13 +45,12 @@ class Main(commands.Cog):
         guilds.close_db()
 
     #TASKS
-    @tasks.loop(seconds = 60)
+    @tasks.loop(seconds = 30)
     async def change_status(self):
         await self.bot.change_presence(activity=discord.Game(next(self.status_list)))
 
 
     # COMMANDS
-
     @commands.command(
         name="prefix",
         brief=f'Ex: $prefix !',
@@ -61,8 +60,6 @@ class Main(commands.Cog):
         msg = await ctx.send(f'Deseja mesmo atualizar o prefixo para <{prefix}> ?')
         accept =  "✅"
         decline = "❌"
-        await msg.add_reaction(accept)
-        await msg.add_reaction(decline)
         def check(reaction, user):
             return user == ctx.author and str(
                 reaction.emoji) in [accept, decline] and reaction.message == msg
@@ -81,12 +78,12 @@ class Main(commands.Cog):
             elif str(reaction.emoji) == decline:
                 message = f'Tudo bem, o prefixo do bot neste servidor não mudou.'
                 await ctx.send(message)
-        except:
-            message = f'Ocorreu um erro ao processar o comando :('
-            await ctx.send(message)
+        except Exception as e:
+            await msg.remove_reaction(decline, msg.author)
+            await msg.remove_reaction(accept, msg.author)
     
 
-    @commands.command(
+    '''@commands.command(
         brief=f'Ex: $set_activity_timer 5',
         description='Define o intervalo em segundos entre os status de atividade do bot.')
     @commands.has_permissions(manage_guild=True)
@@ -94,10 +91,10 @@ class Main(commands.Cog):
         self.change_status.change_interval(seconds = time)
         self.change_status.restart()
         message = f'Atividade do bot mudará a cada {time} segundos!'
-        await ctx.send(message)
+        await ctx.send(message)'''
     
 
-    @commands.command(
+    '''@commands.command(
         brief=f'Ex: $set_activity_list A1, A2, A3',
         description='Define uma lista de status de atividade do bot para serem mostrados em um loop')
     @commands.has_permissions(manage_guild=True)
@@ -106,10 +103,10 @@ class Main(commands.Cog):
         self.status_list = cycle([x.strip() for x in string.split(",")])
         self.change_status.restart()
         message = f'Lista de atividades do bot atualizada com sucesso!'
-        await ctx.send(message)
+        await ctx.send(message)'''
 
 
-    @commands.command(
+    '''@commands.command(
         name='dbsync',
         brief=f'Ex: $dbsync',
         description='Pega todas as informações relevantes do servidor e seus membros e salva no banco')
@@ -136,10 +133,10 @@ class Main(commands.Cog):
         await ctx.send(message)
         # message = f'Membros inalterados no banco: {nomes}'
         # await ctx.send(message)
-        users.close_db()
+        users.close_db()'''
 
     
-    @commands.command(
+    '''@commands.command(
         name='user',
         brief=f'Ex: $user @crush',
         description='Verifica se o usuário está registrado no banco')
@@ -151,7 +148,7 @@ class Main(commands.Cog):
             message = f'O usuário {member.nick} está registrado no banco!'
         else:
             message = f'O usuário {member.name}, AKA {member.nick} não foi encontrado no banco. ID: {member.id}'
-        await ctx.send(message)
+        await ctx.send(message)'''
         
 
 def setup(bot):

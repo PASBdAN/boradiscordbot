@@ -11,7 +11,22 @@ class Users(Client):
             # self.cursor.executescript(schema)
             self.cursor.execute(schema)
     
-    def get_user_value(self, user_id, column):
+    def get_all_users_values(self, *args):
+        field_list = [str(x) for x in args]
+        # self.cursor.execute(f"""
+        #     SELECT {column} FROM {self.tb_name} WHERE user_id = ?
+        # """, (user_id,))
+        self.cursor.execute(
+            sql.SQL("SELECT {fields} FROM {table}").format(
+                fields=sql.SQL(',').join([
+                    sql.Identifier(x) for x in field_list
+                ]),
+                table=sql.Identifier(self.tb_name)
+            )
+        )
+        return self.cursor.fetchall()
+
+    def get_user_value(self, user_id:str, column:str):
         # self.cursor.execute(f"""
         #     SELECT {column} FROM {self.tb_name} WHERE user_id = ?
         # """, (user_id,))

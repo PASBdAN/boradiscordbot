@@ -2,25 +2,22 @@ import vrchatapi
 from vrchatapi.api import authentication_api, users_api, friends_api, invite_api, instances_api, worlds_api
 from vrchatapi.model.invite_request import InviteRequest
 from vrchatapi.model.instance_id import InstanceID
-from time import sleep
-import os
 
-# from config.config import VRCHAT_AUTH, NOUNCE
+from manage import dict_config
+VRCHAT_AUTH = dict_config['VRCHAT_AUTH']
+NOUNCE = dict_config['NOUNCE']
 
 class Bot():
     def __init__(self):
-        self.username = os.environ['VRCHAT_AUTH'].split(":")[0]
-        # self.username = VRCHAT_AUTH.split(":")[0]
-        self.password = os.environ['VRCHAT_AUTH'].split(":")[1]
-        # self.password = VRCHAT_AUTH.split(":")[1]
+        self.username = VRCHAT_AUTH.split(":")[0]
+        self.password = VRCHAT_AUTH.split(":")[1]
         self.config = vrchatapi.Configuration(
             username=self.username,
             password=self.password
         )
         self.api_client = None
         self.id = ""
-        self.nounce = os.environ['NOUNCE']
-        # self.nounce = NOUNCE
+        self.nounce = NOUNCE
         self.timesleep = 4
 
     def open_api(self):

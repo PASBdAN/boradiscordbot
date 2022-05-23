@@ -1,24 +1,26 @@
 import discord
 from discord.ext import commands
+# from database.events import Events as GuildEvents
 import random
-from datetime import datetime
+from datetime import datetime# , timezone
+
+
 
 class Events(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.module_name = "Events"
 
     # Inicialização do bot
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Módulo Events pronto!')
+        print(f'Módulo {self.module_name} pronto!')
 
     # EVENT LISTENERS
 
     # TASKS
 
-
     # COMMANDS
-
     @commands.command(brief=f'Ex: $pairs @everyone',
         description='Gera pares aleatórios dos membros com o cargo especificado.')
     @commands.has_permissions(manage_guild=True)
@@ -49,6 +51,24 @@ class Events(commands.Cog):
                 await user.send(message)
             except:
                 continue
+
     
+    '''@commands.command(name = 'create_event',
+        brief=f'Ex: $create_event @DateFake2022',
+        description='Adiciona um evento no banco de dados')
+    @commands.has_permissions(manage_guild=True)
+    async def _create_event(self, ctx, role: discord.Role):
+        events = GuildEvents()
+        event_db = events.get_event_value(role.id, 'timestamp')
+        if event_db:
+            await ctx.send(f"A role {role.name} já existe no banco como um evento, criada na data {datetime.strftime(event_db[0],'%d/%m/%Y')}")
+        else:
+            events.insert_event_value(role.id, ctx.guild.id, 'guild_id')
+            events.update_event_value(role.id, datetime.now(timezone.utc), 'timestamp')
+            await ctx.send(f"A role {role.name} foi cadastrada no banco como um evento!")
+        events.close_db()'''
+
+
+        
 def setup(bot):
     bot.add_cog(Events(bot))

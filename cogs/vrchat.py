@@ -1,7 +1,5 @@
-import discord
 from discord.ext import commands
 from discord import Embed
-from discord.utils import get
 from vrchat.bot import Bot
 import asyncio
 
@@ -51,10 +49,9 @@ class VrChat(commands.Cog):
         join =  "☑️"
         await msg.add_reaction(left)
         await msg.add_reaction(right)
-        await msg.add_reaction(join)
         def check(reaction, user):
             return user == ctx.author and str(
-                reaction.emoji) in [left, right, join] and reaction.message == msg
+                reaction.emoji) in [left, right] and reaction.message == msg
         while True:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=10.0, check=check)
@@ -82,13 +79,11 @@ class VrChat(commands.Cog):
                         ("World ID",worlds[i].id,False)],
                         worlds[i].image_url,
                         0xff66cc,f"{i+1}/{len(worlds)}"))
-                if str(reaction.emoji) == join:
-                    await ctx.send('FEATURE NOT READY YET')
             except asyncio.TimeoutError:
                 break
 
 
-    @commands.command(
+    '''@commands.command(
         brief=f'Ex: $send_friend_request Flakesu Ciri♥ Tarado',
         description="Envie um friend request do bot para os usuários especificados")
     @commands.has_permissions(manage_guild=True)
@@ -98,10 +93,10 @@ class VrChat(commands.Cog):
             if usuario:
                 await ctx.send(f"Pedido de amizade enviado ao usuário {usuario.display_name}!")
             else:
-                await ctx.send(f"Houve um erro no ao enviar friend request ao usuário {user}")
+                await ctx.send(f"Houve um erro no ao enviar friend request ao usuário {user}")'''
 
 
-    @commands.command(
+    '''@commands.command(
         brief=f'Ex: $invite_users <worldId> 69024 Friends+ Flakesu Ciri♥ Tarado',
         description="Cria uma instância do mundo com o worldId especificado. O primeiro argumento é o worldId do mundo que você quer criar a instância, sugiro conseguir ele com o comando $search_world. O segundo argumento é o modo da sala (public, friends, invite+, etc). O terceiro argumento é o id da instância do mundo. Os argumentos seguintes são nomes de usuários do VRChat.")
     @commands.has_permissions(manage_guild=True)
@@ -116,7 +111,7 @@ class VrChat(commands.Cog):
             if usuario:
                 await ctx.send(f"O usuário {usuario} foi convidado!")
             else:
-                await ctx.send(f"Houve um erro ao convidar o usuário {user}")
+                await ctx.send(f"Houve um erro ao convidar o usuário {user}")'''
 
 def setup(bot):
     bot.add_cog(VrChat(bot))
