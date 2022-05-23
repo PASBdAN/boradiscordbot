@@ -46,7 +46,7 @@ class VrChat(commands.Cog):
             0xff66cc,f"{i+1}/{len(worlds)}"))
         left = "⬅️"
         right = "➡️"
-        join =  "☑️"
+        # join =  "☑️"
         await msg.add_reaction(left)
         await msg.add_reaction(right)
         def check(reaction, user):

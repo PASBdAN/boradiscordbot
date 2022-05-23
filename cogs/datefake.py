@@ -19,8 +19,8 @@ class Datefake(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.module_name = "Datefake"
-        self.role_id = 978153725711503430
-        # self.role_id = 978155909987577876 # server de teste
+        # self.role_id = 978153725711503430
+        self.role_id = 978155909987577876 # server de teste
 
     # Inicialização do bot
     @commands.Cog.listener()
@@ -133,6 +133,7 @@ class Datefake(commands.Cog):
         description='Cria um chat privado')
     async def _datefake(self, ctx):
         event_name = "Datefake"
+        await ctx.message.delete()
         channel = await self.create_private_channel(ctx)
         await channel.send(f"{ctx.author.mention}\nEste canal é privado e será deletado em seguida.")
 
