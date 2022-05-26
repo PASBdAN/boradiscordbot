@@ -8,7 +8,6 @@ from manage import dict_config
 
 BOT_KEY = dict_config['BOT_KEY']
 
-
 def get_prefix(bot, message):
     db = Client('Guilds')
     server_prefix = db.select('prefix',id = message.guild.id)

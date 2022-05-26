@@ -34,7 +34,16 @@ class Main(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         db = Client('Users')
-        user_list = [await self.bot.fetch_user(int(y[0])) for y in db.select('id')]
+        members_list = [x for x in self.bot.get_all_members()]
+        print(members_list)
+        for member in members_list:
+            try:
+                aux = db.insert(id=member.id,name=member.name,nickname=member.display_name,created_at=datetime.now(timezone.utc))
+            except Exception as e:
+                db.conn.rollback()
+                print(e)
+        db.close_db()
+        user_list = members_list# [await self.bot.fetch_user(int(y[0])) for y in db.select('id')]
         self.funny_people = [x.display_name for x in user_list]
         self.funny_emoji = ["😍","😳","😈","😏","🤫","💋","❤️","👀"]
         random.shuffle(self.funny_people)

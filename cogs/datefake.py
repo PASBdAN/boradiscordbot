@@ -85,6 +85,7 @@ class Datefake(commands.Cog):
                 db.insert(id = ctx.author.id, name = ctx.author.name, nickname = ctx.author.display_name, created_at = datetime.now(timezone.utc))
             db.tb_name = 'Datefake'
             db.insert(user_id = ctx.author.id, guild_id = ctx.author.guild.id, created_at = datetime.now(timezone.utc))
+            db.close_db()
             await ctx.author.add_roles(ctx.author.guild.get_role(self.role_id))
             await channel.send("Você foi adicionado na lista de participantes do evento.")
             return True
@@ -95,6 +96,7 @@ class Datefake(commands.Cog):
         aux = db.select('id',user_id=ctx.author.id)
         if aux:
             db.delete(id=aux[0][0])
+            db.close_db()
             await ctx.author.remove_roles(ctx.author.guild.get_role(self.role_id))
             await channel.send("Você foi removido da lista de participantes!")
             return True
@@ -103,6 +105,7 @@ class Datefake(commands.Cog):
     async def check_participation(self, ctx):
         db = Client('Datefake')
         aux = db.select(user_id = ctx.author.id)
+        db.close_db()
         if aux:
             return True
         return False
@@ -144,6 +147,7 @@ class Datefake(commands.Cog):
     async def _participants(self, ctx):
         db = Client('Datefake')
         users_list = [ctx.guild.get_member(y[0]).display_name for y in db.select('user_id')]
+        db.close_db()
         output = f'Total de participantes: {len(users_list)}'
         for user in users_list:
             output += f'\n{user}'

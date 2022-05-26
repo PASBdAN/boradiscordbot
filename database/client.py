@@ -1,4 +1,3 @@
-# import sqlite3
 import psycopg2
 from psycopg2 import sql
 
@@ -60,7 +59,7 @@ class Client():
         self.cursor.execute(    
             query, tuple([x[1] for x in values.items()])
         )
-        self.commit_db()
+        return self.commit_db()
 
 
     def delete(self, **filters):
@@ -79,7 +78,7 @@ class Client():
         self.cursor.execute(
             query, tuple([x[1] for x in filters.items()])
         )
-        self.commit_db()
+        return self.commit_db()
 
 
     def update_by_id(self, **values):
@@ -102,7 +101,7 @@ class Client():
         self.cursor.execute(
             query, tuple(lista)
         )
-        self.commit_db()
+        return self.commit_db()
 
 
     def commit_db(self):
