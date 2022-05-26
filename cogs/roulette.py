@@ -57,10 +57,10 @@ class Roulette(commands.Cog):
         db = Client('MarryUsers')
         is_married = False
         user_id = db.select('user_id',married_user = member.id)
-        married_message = 'Reaja para se casar!'
+        married_message = 'Reaja para gadear!'
         db.close_db()
         if user_id:
-            married_message = f'Usuário já é casado com {ctx.guild.get_member(user_id[0][0]).display_name}'
+            married_message = f'Usuário já é dono(a) do gado(a) {ctx.guild.get_member(user_id[0][0]).display_name}'
             is_married = True
         greater_role = member.roles[0]
         for role in member.roles[1:]:
@@ -70,7 +70,7 @@ class Roulette(commands.Cog):
         msg = await ctx.send(embed = self.create_embed(
             member.name,
             [
-                ("Role: ",greater_role.name,False),
+                ("Cargo: ",greater_role.name,False),
             ],
             member.avatar_url,
             0xff66cc, married_message))
@@ -80,14 +80,14 @@ class Roulette(commands.Cog):
             db = Client('MarryUsers')
             db.insert(user_id = ctx.author.id, married_user = member.id, created_at = datetime.now(timezone.utc))
             db.close_db()
-            await ctx.send(f'{ctx.author.display_name} e {member.display_name} são casados 💖')
+            await ctx.send(f'{ctx.author.display_name} é gado(a) de {member.display_name}!')
 
     @commands.command(
-        name='mymarry',
-        brief=f'Ex: $mymarry',
-        description='Retorna o seu harem!')
+        name='mylist',
+        brief=f'Ex: $mylist',
+        description='Retorna a sua listinha!')
     @commands.has_permissions(manage_guild=True)
-    async def _mymarry(self, ctx):
+    async def _mylist(self, ctx):
         db = Client('MarryUsers')
         marry_id_list = [x[0] for x in db.select('married_user',user_id = ctx.author.id)]
         db.close_db()
@@ -96,14 +96,14 @@ class Roulette(commands.Cog):
         for user_id in marry_id_list:
             casou += f'\n - {ctx.guild.get_member(user_id).display_name}'
         if not casou:
-            casou = ' - Você não casou com ninguém ainda...'
-        embed_lines.append(('Casou com:',casou,False))
-        casado = ' - Ninguém se casou com você ainda...'
+            casou = ' - Você não é gado(a) de ninguém ainda...'
+        embed_lines.append(('Gadeando:',casou,False))
+        casado = ' - Ninguém está gadeando você ainda...'
         db = Client('MarryUsers')
         married_to = [x[0] for x in db.select('user_id',married_user = ctx.author.id)]
         if married_to:
             casado = f' - {ctx.guild.get_member(married_to[0]).display_name}'
-        embed_lines.append(('Está casado com:',casado,False))
+        embed_lines.append(('É dono(a) do seguinte gado(a):',casado,False))
         msg = await ctx.send(embed = self.create_embed(
             f'Harem do {ctx.author.display_name}',
             embed_lines,
