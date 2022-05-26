@@ -10,12 +10,15 @@ class Roulette(commands.Cog):
         self.bot = bot
         self.module_name = "Roulette"
 
-    def create_embed(self, title:str, fields:list, image, colour, footer = ''):
+    def create_embed(self, title:str, fields:list, image, colour, footer = '', thumbnail = None):
         embed = Embed(title=title)
         fields = fields
         for name, value, inline in fields:
             embed.add_field(name=name, value=value, inline=inline)
-        embed.set_image(url=image)
+        if image:
+            embed.set_image(url=image)
+        if thumbnail:
+            embed.set_thumbnail(url=thumbnail)
         embed.colour = colour
         embed.set_footer(text = footer)
         return embed
@@ -78,6 +81,34 @@ class Roulette(commands.Cog):
             db.insert(user_id = ctx.author.id, married_user = member.id, created_at = datetime.now(timezone.utc))
             db.close_db()
             await ctx.send(f'{ctx.author.display_name} e {member.display_name} são casados 💖')
+
+    @commands.command(
+        name='mymarry',
+        brief=f'Ex: $mymarry',
+        description='Retorna o seu harem!')
+    @commands.has_permissions(manage_guild=True)
+    async def _mymarry(self, ctx):
+        db = Client('MarryUsers')
+        marry_id_list = [x[0] for x in db.select('married_user',user_id = ctx.author.id)]
+        db.close_db()
+        casou = ''
+        embed_lines = []
+        for user_id in marry_id_list:
+            casou += f'\n - {ctx.guild.get_member(user_id).display_name}'
+        embed_lines.append(('Casou com:',casou,False))
+        casado = ' - Ninguém se casou com você ainda...'
+        db = Client('MarryUsers')
+        married_to = [x[0] for x in db.select('user_id',married_user = ctx.author.id)]
+        if married_to:
+            casado = f' - {ctx.guild.get_member(married_to[0]).display_name}'
+        embed_lines.append(('Está casado com:',casado,False))
+        msg = await ctx.send(embed = self.create_embed(
+            f'Harem do {ctx.author.display_name}',
+            embed_lines,
+            None,
+            0xff66cc,
+            '',
+            ctx.author.avatar_url))
 
 def setup(bot):
     bot.add_cog(Roulette(bot))

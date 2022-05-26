@@ -112,6 +112,6 @@ class Client():
     def close_db(self):
         if self.conn:
             self.conn.close()
-            print("Sessão finalizada")
+            # print("Sessão finalizada")
 
         
