@@ -95,6 +95,8 @@ class Roulette(commands.Cog):
         embed_lines = []
         for user_id in marry_id_list:
             casou += f'\n - {ctx.guild.get_member(user_id).display_name}'
+        if not casou:
+            casou = ' - Você não casou com ninguém ainda...'
         embed_lines.append(('Casou com:',casou,False))
         casado = ' - Ninguém se casou com você ainda...'
         db = Client('MarryUsers')
