@@ -33,7 +33,7 @@ class Roulette(commands.Cog):
         user_parameters = users.select('roll_count','roll_timestamp',id=ctx.author.id)
         if user_parameters:
             if user_parameters[0][0] < 5:
-                users.update_by_id(id=ctx.author.id,roll_count=user_parameters[0][0] + 1,roll_timestamp=datetime.now(timezone.utc))
+                users.update_by_id(id=ctx.author.id,roll_count=user_parameters[0][0] + 1)
                 users.close_db()
                 return True
             else:
