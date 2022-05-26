@@ -36,6 +36,9 @@ class Roulette(commands.Cog):
     # Inicialização do bot
     @commands.Cog.listener()
     async def on_ready(self):
+        db = Client('Users')
+        self.members_id_list = [x[0] for x in db.select('id')]
+        db.close_db()
         print(f'Módulo {self.module_name} pronto!')
 
 
@@ -46,17 +49,16 @@ class Roulette(commands.Cog):
         description='Retorna uma embed message interagível por reactions de um usuário do servidor')
     @commands.has_permissions(manage_guild=True)
     async def _roll(self, ctx):
-        db = Client('Users')
-        members_list = db.select('id')
-        db.close_db()
-        random.shuffle(members_list)
-        member = ctx.guild.get_member(members_list[0][0])
+        random.shuffle(self.members_id_list)
+        member = ctx.guild.get_member(self.members_id_list[0])
         db = Client('MarryUsers')
-        is_married = 'Reaja para se casar!'
+        is_married = False
         user_id = db.select('user_id',married_user = member.id)
+        married_message = 'Reaja para se casar!'
         db.close_db()
         if user_id:
-            is_married = f'Usuário já é casado com {ctx.guild.get_member(user_id[0][0]).display_name}'
+            married_message = f'Usuário já é casado com {ctx.guild.get_member(user_id[0][0]).display_name}'
+            is_married = True
         greater_role = member.roles[0]
         for role in member.roles[1:]:
             if role.position > greater_role.position:
@@ -68,7 +70,9 @@ class Roulette(commands.Cog):
                 ("Role: ",greater_role.name,False),
             ],
             member.avatar_url,
-            0xff66cc, is_married))
+            0xff66cc, married_message))
+        if is_married:
+            return None
         if await self.confirmation_react(ctx,msg):
             db = Client('MarryUsers')
             db.insert(user_id = ctx.author.id, married_user = member.id, created_at = datetime.now(timezone.utc))
