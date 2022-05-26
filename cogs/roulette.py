@@ -9,6 +9,11 @@ class Roulette(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.module_name = "Roulette"
+        db = Client('Users')
+        self.members_id_list = [x[0] for x in db.select('id')]
+        db.close_db()
+        self.roll_limit = 5
+        self.roll_cooldown = 60
 
     def create_embed(self, title:str, fields:list, image, colour, footer = '', thumbnail = None):
         embed = Embed(title=title)
@@ -22,6 +27,25 @@ class Roulette(commands.Cog):
         embed.colour = colour
         embed.set_footer(text = footer)
         return embed
+
+    async def roll_availability(self, ctx):
+        users = Client('Users')
+        user_parameters = users.select('roll_count','roll_timestamp',id=ctx.author.id)
+        if user_parameters:
+            if user_parameters[0][0] < 5:
+                users.update_by_id(id=ctx.author.id,roll_count=user_parameters[0][0] + 1,roll_timestamp=datetime.now(timezone.utc))
+                users.close_db()
+                return True
+            else:
+                diff = datetime.now(timezone.utc) - user_parameters[0][1]
+                if int(diff.total_seconds() / 60) <= self.roll_cooldown:
+                    users.close_db()
+                    await ctx.send(f'Você conseguirá rolar novamente em {self.roll_cooldown - int(diff.total_seconds()/60)} minutos!')
+                    return False
+                else:
+                    users.update_by_id(id=ctx.author.id,roll_count=1,roll_timestamp=datetime.now(timezone.utc))
+                    users.close_db()
+                    return True
 
     async def confirmation_react(self, ctx, msg, timeout = 20.0):
         accept =  "💖"
@@ -39,9 +63,6 @@ class Roulette(commands.Cog):
     # Inicialização do bot
     @commands.Cog.listener()
     async def on_ready(self):
-        db = Client('Users')
-        self.members_id_list = [x[0] for x in db.select('id')]
-        db.close_db()
         print(f'Módulo {self.module_name} pronto!')
 
 
@@ -52,6 +73,8 @@ class Roulette(commands.Cog):
         description='Retorna uma embed message interagível por reactions de um usuário do servidor')
     @commands.has_permissions(manage_guild=True)
     async def _roll(self, ctx):
+        if not await self.roll_availability(ctx):
+            return None
         random.shuffle(self.members_id_list)
         member = ctx.guild.get_member(self.members_id_list[0])
         db = Client('MarryUsers')
