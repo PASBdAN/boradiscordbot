@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from datetime import datetime, timezone, timedelta
 from asyncio import sleep
-from database.users import Users
+from database.client import Client
 
 def dia_tarde_noite():
     timezone_offset = -3.0  # São Paulo (UTC−03:00)
@@ -27,6 +27,7 @@ class Datefake(commands.Cog):
     async def on_ready(self):
         print(f'Módulo {self.module_name} pronto!')
 
+
     async def delete_channel(self, ctx, channel, time = 10, can_cancel = False):
         if not can_cancel:
             await channel.send(f"Este canal será deletado em {time} segundos! {dia_tarde_noite().capitalize()}!")
@@ -39,6 +40,7 @@ class Datefake(commands.Cog):
                 return None
             await channel.delete()
         return True
+
 
     async def confirmation_react(self, ctx, msg, timeout = 20.0):
         accept =  "✅"
@@ -61,6 +63,7 @@ class Datefake(commands.Cog):
             await msg.remove_reaction(accept, msg.author)
             return False
 
+
     async def create_private_channel(self, ctx):
         guild = ctx.guild
         member = ctx.author
@@ -72,61 +75,38 @@ class Datefake(commands.Cog):
             overwrites[role] = discord.PermissionOverwrite(read_messages=False)
         return await guild.create_text_channel(f'datefake_{member}', overwrites=overwrites)
 
-    async def invite_pair(self, ctx, channel):
-        await channel.send("Marque neste chat quem é a pessoa que você deseja convidar. Ex: @crush")
-        await channel.send("OBS: A pessoa será adicionada neste chat para confirmar. Fale com ela antes pelo amor de deus.")
-        return None
 
     async def add_user_to_pool(self, ctx, channel):
-        users = Users()
-        if users.get_user_value(ctx.author.id,'datefake'):
-            users.update_user_value(ctx.author.id,True,'datefake')
-            users.update_user_value(ctx.author.id, datetime.now(timezone.utc), 'datefake_join_date')
+        db = Client('Datefake')
+        aux = db.select('id',user_id=ctx.author.id)
+        if not aux:
+            db.tb_name = 'Users'
+            if not db.select(id = ctx.author.id):
+                db.insert(id = ctx.author.id, name = ctx.author.name, nickname = ctx.author.display_name, created_at = datetime.now(timezone.utc))
+            db.tb_name = 'Datefake'
+            db.insert(user_id = ctx.author.id, guild_id = ctx.author.guild.id, created_at = datetime.now(timezone.utc))
             await ctx.author.add_roles(ctx.author.guild.get_role(self.role_id))
             await channel.send("Você foi adicionado na lista de participantes do evento.")
-        else:
-            users.insert_user_value(ctx.author.id,ctx.author.name,'name')
-            users.update_user_value(ctx.author.id,ctx.author.nick,'nickname')
-            try:
-                users.update_user_value(ctx.author.id,True,'datefake')
-                users.update_user_value(ctx.author.id, datetime.now(timezone.utc), 'datefake_join_date')
-                await ctx.author.add_roles(ctx.author.guild.get_role(self.role_id))
-                await channel.send("Você foi adicionado na lista de participantes do evento.")
-            except Exception as e:
-                await channel.send("Houve um erro ao adicionar você na lista :( tira print desta merda e manda pro Flakesu")
-                await channel.send(f"Error: {e}")
+            return True
+
 
     async def remove_user_from_pool(self, ctx, channel):
-        users = Users()
-        if users.get_user_value(ctx.author.id,'datefake'):
-            users.update_user_value(ctx.author.id,False,'datefake')
-            users.update_user_value(ctx.author.id, datetime.now(timezone.utc), 'datefake_leave_date')
+        db = Client('Datefake')
+        aux = db.select('id',user_id=ctx.author.id)
+        if aux:
+            db.delete(id=aux[0][0])
             await ctx.author.remove_roles(ctx.author.guild.get_role(self.role_id))
-            # ctx.author.remove_roles(ctx.get_role(self.role_id))
             await channel.send("Você foi removido da lista de participantes!")
-        else:
-            users.insert_user_value(ctx.author.id,ctx.author.name,'name')
-            users.update_user_value(ctx.author.id,ctx.author.nick,'nickname')
-            try:
-                users.update_user_value(ctx.author.id,False,'datefake')
-                users.update_user_value(ctx.author.id, datetime.now(timezone.utc), 'datefake_leave_date')
-                await ctx.author.remove_roles(ctx.author.guild.get_role(self.role_id))
-                # ctx.author.remove_roles(ctx.get_role(self.role_id))
-                await channel.send("Você foi removido da lista de participantes!")
-            except Exception as e:
-                await channel.send("Houve um erro ao remover você da lista :( tira print desta merda e manda pro Flakesu")
-                await channel.send(f"Error: {e}")
+            return True
         
 
     async def check_participation(self, ctx):
-        users = Users()
-        tupla = users.get_user_value(ctx.author.id,'datefake')
-        try:
-            if tupla[0]:
-                return True
-            return False
-        except TypeError:
-            return False
+        db = Client('Datefake')
+        aux = db.select(user_id = ctx.author.id)
+        if aux:
+            return True
+        return False
+
 
     @commands.command(name='datefake',
         brief=f'Ex: $datefake',
@@ -156,28 +136,17 @@ class Datefake(commands.Cog):
             await channel.send("Ok! Você não foi adicionado na lista de participantes...")
             return await self.delete_channel(ctx, channel)
 
-        '''msg = await channel.send("Você gostaria de convidar ou ser convidado(a) por alguém para o evento?")
-        confirmation = await self.confirmation_react(ctx, msg)
-        if confirmation:
-            await self.invite_pair(ctx, channel)
-        else:
-            return await self.delete_channel(ctx, channel)
-
-        return await self.delete_channel(ctx, channel)'''
 
     @commands.command(name='participants',
         brief=f'Ex: $participants',
         description='Retorna uma lista de participantes')
     @commands.has_permissions(manage_guild=True)
     async def _participants(self, ctx):
-        users = Users()
-        users_list = [y for y in users.get_all_users_values('name','nickname','datefake') if y[-1]]
+        db = Client('Datefake')
+        users_list = [ctx.guild.get_member(y[0]).display_name for y in db.select('user_id')]
         output = f'Total de participantes: {len(users_list)}'
         for user in users_list:
-            if user[1]:
-                output += f"\n{user[1]}"
-            else:
-                output += f"\n{user[0]}"
+            output += f'\n{user}'
         await ctx.send(output)
 
 def setup(bot):

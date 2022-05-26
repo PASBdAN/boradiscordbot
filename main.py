@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands
 import os
-from database.guilds import Guilds
+from database.client import Client
 
 from manage import dict_config
 
@@ -10,15 +10,11 @@ BOT_KEY = dict_config['BOT_KEY']
 
 
 def get_prefix(bot, message):
-    server_prefix = []
-    guilds = Guilds()
-    try:
-        server_prefix = guilds.get_guild_value(message.guild.id,'prefix')
-        if server_prefix:
-            return server_prefix[0]
-        else:
-            return '$'
-    except:
+    db = Client('Guilds')
+    server_prefix = db.select('prefix',id = message.guild.id)
+    if server_prefix:
+        return server_prefix[0]
+    else:
         return '$'
 
 intents = discord.Intents.default()

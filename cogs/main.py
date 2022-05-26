@@ -1,20 +1,40 @@
 import discord
 from discord.ext import commands, tasks
-# from discord import Embed
-from database.guilds import Guilds
-from database.users import Users
+from database.client import Client
 from itertools import cycle
 import random
+from datetime import datetime, timezone, timedelta
 
 class Main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def confirmation_react(self, ctx, msg, timeout = 20.0):
+        accept =  "✅"
+        decline = "❌"
+        await msg.add_reaction(accept)
+        await msg.add_reaction(decline)
+        def check(reaction, user):
+            return user == ctx.author and str(
+                reaction.emoji) in [accept, decline] and reaction.message == msg
+        try:
+            reaction, user = await self.bot.wait_for("reaction_add", timeout=timeout, check=check)
+            if str(reaction.emoji) == accept:
+                await msg.remove_reaction(decline, msg.author)
+                return True
+            else:
+                await msg.remove_reaction(accept, msg.author)
+                return False
+        except Exception as e:
+            await msg.remove_reaction(decline, msg.author)
+            await msg.remove_reaction(accept, msg.author)
+            return False
+
     # EVENT LISTENERS
     @commands.Cog.listener()
     async def on_ready(self):
-        users = Users()
-        user_list = [await self.bot.fetch_user(int(y[0])) for y in users.get_all_users_values('id')]
+        db = Client('Users')
+        user_list = [await self.bot.fetch_user(int(y[0])) for y in db.select('id')]
         self.funny_people = [x.display_name for x in user_list]
         self.funny_emoji = ["😍","😳","😈","😏","🤫","💋","❤️","👀"]
         random.shuffle(self.funny_people)
@@ -30,19 +50,19 @@ class Main(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        guilds = Guilds()
-        prefix = guilds.get_guild_value(guild.id,'prefix')
+        db = Client('Guilds')
+        prefix = db.select('prefix',id = guild.id)
         if prefix:
-            guilds.update_guild_value(guild.id,'$','prefix')
+            db.update_by_id(id = guild.id, prefix = '$')
         else:
-            guilds.insert_guild_value(guild.id, '$','prefix')
-        guilds.close_db()
+            db.insert(id=guild.id,prefix='$', created_at = datetime.now(timezone.utc))
+        db.close_db()
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        guilds = Guilds()
-        guilds.delete_guild(guild.id)
-        guilds.close_db()
+        db = Client('Guilds')
+        db.delete(id = guild.id)
+        db.close_db()
 
     #TASKS
     @tasks.loop(seconds = 30)
@@ -58,97 +78,19 @@ class Main(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def _prefix(self, ctx, prefix):
         msg = await ctx.send(f'Deseja mesmo atualizar o prefixo para <{prefix}> ?')
-        accept =  "✅"
-        decline = "❌"
-        def check(reaction, user):
-            return user == ctx.author and str(
-                reaction.emoji) in [accept, decline] and reaction.message == msg
-        try:
-            reaction, user = await self.bot.wait_for("reaction_add", timeout=10.0, check=check)
-            if str(reaction.emoji) == accept:
-                guilds = Guilds()
-                prefix_db = guilds.get_guild_value(ctx.guild.id, 'prefix')
-                if prefix_db:
-                    guilds.update_guild_value(ctx.guild.id, prefix, 'prefix')
-                else:
-                    guilds.insert_guild_value(ctx.guild.id, prefix, 'prefix')
-                guilds.close_db()
-                message = f'O prefixo de comandos do bot agora é {prefix}'
-                await ctx.send(message)
-            elif str(reaction.emoji) == decline:
-                message = f'Tudo bem, o prefixo do bot neste servidor não mudou.'
-                await ctx.send(message)
-        except Exception as e:
-            await msg.remove_reaction(decline, msg.author)
-            await msg.remove_reaction(accept, msg.author)
-    
-
-    '''@commands.command(
-        brief=f'Ex: $set_activity_timer 5',
-        description='Define o intervalo em segundos entre os status de atividade do bot.')
-    @commands.has_permissions(manage_guild=True)
-    async def set_activity_timer(self, ctx, time: int):
-        self.change_status.change_interval(seconds = time)
-        self.change_status.restart()
-        message = f'Atividade do bot mudará a cada {time} segundos!'
-        await ctx.send(message)'''
-    
-
-    '''@commands.command(
-        brief=f'Ex: $set_activity_list A1, A2, A3',
-        description='Define uma lista de status de atividade do bot para serem mostrados em um loop')
-    @commands.has_permissions(manage_guild=True)
-    async def set_activity_list(self, ctx, *args):
-        string = ' '.join(args)
-        self.status_list = cycle([x.strip() for x in string.split(",")])
-        self.change_status.restart()
-        message = f'Lista de atividades do bot atualizada com sucesso!'
-        await ctx.send(message)'''
-
-
-    '''@commands.command(
-        name='dbsync',
-        brief=f'Ex: $dbsync',
-        description='Pega todas as informações relevantes do servidor e seus membros e salva no banco')
-    @commands.has_permissions(administrator=True)
-    async def dbsync(self, ctx):
-        users = Users()
-        nomes_update = ""
-        # nomes = ""
-        nomes_insert = ""
-        for member in ctx.guild.members:
-            name = users.get_user_value(member.id,'name') # RETORNA UMA TUPLA
-            if name:
-                if name[0] != member.name:
-                    users.update_user_value(member.id,member.name,'name')
-                    nomes_update += f" {member.name}"
-                # else:
-                #     nomes += f" {name}"
+        if await self.confirmation_react(ctx,msg):
+            db = Client('Guilds')
+            prefix_db = db.select('prefix', id = ctx.guild.id)
+            if prefix_db:
+                db.update_by_id(id = ctx.guild.id, prefix = prefix)
             else:
-                users.insert_user_value(member.id, member.name,'name')
-                nomes_insert += f" {member.name}"
-        message = f'Membros inseridos no banco: {nomes_insert}'
-        await ctx.send(message)
-        message = f'Membros atualizados no banco: {nomes_update}'
-        await ctx.send(message)
-        # message = f'Membros inalterados no banco: {nomes}'
-        # await ctx.send(message)
-        users.close_db()'''
-
-    
-    '''@commands.command(
-        name='user',
-        brief=f'Ex: $user @crush',
-        description='Verifica se o usuário está registrado no banco')
-    @commands.has_permissions(manage_guild=True)
-    async def get_user(self, ctx, member: discord.Member):
-        users = Users()
-        name = users.get_user_value(member.id,'name')
-        if name:
-            message = f'O usuário {member.nick} está registrado no banco!'
+                db.insert(id = ctx.guild.id, prefix = prefix, created_at = datetime.now(timezone.utc))
+            db.close_db()
+            message = f'O prefixo de comandos do bot agora é {prefix}'
+            await ctx.send(message)
         else:
-            message = f'O usuário {member.name}, AKA {member.nick} não foi encontrado no banco. ID: {member.id}'
-        await ctx.send(message)'''
+            message = f'Tudo bem, o prefixo do bot neste servidor não mudou.'
+            await ctx.send(message)
         
 
 def setup(bot):
