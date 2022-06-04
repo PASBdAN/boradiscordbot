@@ -261,9 +261,9 @@ class Datefake(commands.Cog):
         db.close_db()
         if True in [x[2] for x in user_invites]:
             try:
-                user_display_name = ctx.guild.get_member([x[1] for x in user_invites if x[2]][0]).display_name
+                user_display_name = ctx.guild.get_member([x[1] for x in user_invites if x[2]]).display_name
             except (TypeError, AttributeError):
-                user_display_name = ctx.guild.fetch_member([x[1] for x in user_invites if x[2]][0]).display_name
+                user_display_name = ctx.guild.fetch_member([x[1] for x in user_invites if x[2]]).display_name
             await self.show_participants(ctx, channel)
             await channel.send(f"Você já vai para o evento com 💕 {user_display_name} 💕")
             return await self.delete_channel(ctx, channel)
