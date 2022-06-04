@@ -31,7 +31,7 @@ class Datefake(commands.Cog):
         print(f'Módulo {self.module_name} pronto!')
 
 
-    async def delete_channel(self, ctx, channel, time = 120, can_cancel = False):
+    async def delete_channel(self, ctx, channel, time = 60, can_cancel = False):
         if not can_cancel:
             await channel.send(f"Este canal será deletado em {time} segundos! {dia_tarde_noite().capitalize()}!")
             await sleep(time)
@@ -234,6 +234,7 @@ class Datefake(commands.Cog):
                 user_display_name = ctx.guild.get_member([x[1] for x in user_invites if x[2]][0]).display_name
             except (TypeError, AttributeError):
                 user_display_name = ctx.guild.fetch_member([x[1] for x in user_invites if x[2]][0]).display_name
+            await self.show_participants(ctx, channel)
             await channel.send(f"Você já vai para o evento com 💕 {user_display_name} 💕")
             return await self.delete_channel(ctx, channel)
 
