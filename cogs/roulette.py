@@ -10,7 +10,7 @@ class Roulette(commands.Cog):
         self.bot = bot
         self.module_name = "Roulette"
         db = Client('Users')
-        self.members_id_list = [x[0] for x in db.select('id')]
+        self.members_dict = {x[0]:[x[1],x[2]] for x in db.select('id','roll_count','roll_timestamp')}
         db.close_db()
         self.roll_limit = 5
         self.roll_cooldown = 60
@@ -28,24 +28,17 @@ class Roulette(commands.Cog):
         embed.set_footer(text = footer)
         return embed
 
-    async def roll_availability(self, ctx):
+    async def block_roll(self, ctx):
         users = Client('Users')
-        user_parameters = users.select('roll_count','roll_timestamp',id=ctx.author.id)
-        if user_parameters:
-            if user_parameters[0][0] < 5:
-                users.update_by_id(id=ctx.author.id,roll_count=user_parameters[0][0] + 1)
-                users.close_db()
-                return True
-            else:
-                diff = datetime.now(timezone.utc) - user_parameters[0][1]
-                if int(diff.total_seconds() / 60) <= self.roll_cooldown:
-                    users.close_db()
-                    await ctx.send(f'Você conseguirá rolar novamente em {self.roll_cooldown - int(diff.total_seconds()/60)} minutos!')
-                    return False
-                else:
-                    users.update_by_id(id=ctx.author.id,roll_count=1,roll_timestamp=datetime.now(timezone.utc))
-                    users.close_db()
-                    return True
+        users.update_by_id(id=ctx.author.id,roll_count=self.roll_limit)
+        users.close_db()
+        return self.roll_limit
+
+    async def unblock_roll(self, ctx):
+        users = Client('Users')
+        users.update_by_id(id=ctx.author.id,roll_count=0,roll_timestamp=datetime.now(timezone.utc))
+        users.close_db()
+        return self.roll_limit, datetime.now(timezone.utc)
 
     async def confirmation_react(self, ctx, msg, timeout = 20.0):
         accept =  "💖"
@@ -73,18 +66,35 @@ class Roulette(commands.Cog):
         description='Retorna uma embed message interagível por reactions de um usuário do servidor')
     @commands.has_permissions(manage_guild=True)
     async def _roll(self, ctx):
-        if not await self.roll_availability(ctx):
-            return None
-        random.shuffle(self.members_id_list)
-        member = ctx.guild.get_member(self.members_id_list[0])
+        author = self.members_dict[ctx.author.id]
+        if author[0] > 4:
+            diff = datetime.now(timezone.utc) - author[1]
+            if int(diff.total_seconds() / 60) <= self.roll_cooldown:
+                await self.block_roll(ctx)
+                return await ctx.send(f'Você pode rolar novamente em {self.roll_cooldown - int(diff.total_seconds()/60)} minutos!')
+            else:
+                self.members_dict[ctx.author.id][0] = 0
+                self.members_dict[ctx.author.id][1] = datetime.now(timezone.utc)
+                await self.unblock_roll(ctx)
+        self.members_dict[ctx.author.id][0] += 1
+
+        members_id_list = list(self.members_dict.keys())
+        random.shuffle(members_id_list)
+        try:
+            member = ctx.guild.get_member(members_id_list[0])
+        except (TypeError, AttributeError):
+            member = ctx.guild.fetch_member(members_id_list[0])
+        
         db = Client('MarryUsers')
-        is_married = False
         user_id = db.select('user_id',married_user = member.id)
-        married_message = 'Reaja para gadear!'
         db.close_db()
+
+        married_message = 'Reaja para gadear!'
+        is_married = False
         if user_id:
             married_message = f'Usuário já é dono(a) do gado(a) {ctx.guild.get_member(user_id[0][0]).display_name}'
             is_married = True
+
         greater_role = member.roles[0]
         for role in member.roles[1:]:
             if role.position > greater_role.position:
@@ -101,6 +111,8 @@ class Roulette(commands.Cog):
             db = Client('MarryUsers')
             db.insert(user_id = ctx.author.id, married_user = member.id, created_at = datetime.now(timezone.utc))
             db.close_db()
+            self.members_dict[ctx.author.id][0] = self.block_roll(ctx)
+
             await ctx.send(f'{ctx.author.display_name} é gado(a) de {member.display_name}!')
 
     @commands.command(
