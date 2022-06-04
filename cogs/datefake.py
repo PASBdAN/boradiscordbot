@@ -215,8 +215,10 @@ class Datefake(commands.Cog):
     async def _invite(self, ctx, *member):
         await ctx.message.delete()
         member = ' '.join(member)
-        member = await commands.converter.MemberConverter().convert(ctx,member)
-        if type(member) != discord.Member:
+        try:
+            member = await commands.converter.MemberConverter().convert(ctx,member)
+        except Exception as e:
+            print(e)
             return await ctx.send(f'Usuário {member} não foi encontrado, verifique se tem emojis ou letras maiúsculas no nome do usuário e tente novamente.')
         if member.id == ctx.author.id:
             return await ctx.send('Você não pode convidar você mesmo 💢😡')
