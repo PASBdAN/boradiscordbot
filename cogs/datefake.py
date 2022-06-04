@@ -31,15 +31,15 @@ class Datefake(commands.Cog):
         print(f'Módulo {self.module_name} pronto!')
 
 
-    async def delete_channel(self, ctx, channel, time = 30, can_cancel = False):
+    async def delete_channel(self, ctx, channel, time = 120, can_cancel = False):
         if not can_cancel:
             await channel.send(f"Este canal será deletado em {time} segundos! {dia_tarde_noite().capitalize()}!")
-            await sleep(10)
+            await sleep(time)
             await channel.delete()
             await channel.category.delete()
         else:
             msg = await channel.send(f"Este canal será deletado em {time} segundos! Deseja cancelar?")
-            if await self.confirmation_react(ctx, msg, lambda : True, timeout=10.0):
+            if await self.confirmation_react(ctx, msg, lambda : True, timeout=float(time)):
                 await channel.send(f"O canal não será mais deletado! {dia_tarde_noite().capitalize()}!")
                 return None
             await channel.delete()
@@ -269,8 +269,7 @@ class Datefake(commands.Cog):
                     
         # QUARTO PERMITIR QUE O USUÁRIO CONVIDE ALGUEM:
         await self.show_participants(ctx, channel)
-        msg = await channel.send(f"Para convidar alguém que já está participando, execute o comando  b!invite")
-        await sleep(5)
+        msg = await channel.send(f"Para convidar alguém que já está participando, execute o comando  b!invite  @crush  mencionando o usuário que deseja convidar 🤩")
         return await self.delete_channel(ctx, channel)
 
     @commands.command(name='participants',
