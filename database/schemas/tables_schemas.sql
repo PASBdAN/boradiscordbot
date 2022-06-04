@@ -2,15 +2,15 @@ CREATE TABLE IF NOT EXISTS "Users"(
   "id" bigint PRIMARY KEY,
   "display_name" text,
   "roll_count" INT DEFAULT 0,
-  "roll_timestamp" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;
-  "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;
+  "roll_timestamp" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS "DatefakeUsers" (
   -- "id" SERIAL PRIMARY KEY,
   "user_id" bigint PRIMARY KEY,
   "guild_id" bigint,
-  "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;
+  "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS "DatefakePartners" (
@@ -19,13 +19,13 @@ CREATE TABLE IF NOT EXISTS "DatefakePartners" (
   "partner_id" bigint,
   "has_accepted" boolean,
   "has_refused" boolean,
-  "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;
+  "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS "Guilds" (
   "id" bigint PRIMARY KEY,
   "prefix" text,
-  "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;
+  "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS "UsersToGuilds" (
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS "MarryUsers" (
   "id" SERIAL,
   "user_id" bigint,
   "married_user" bigint,
-  "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;,
+  "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id", "user_id")
 );
 
@@ -63,4 +63,4 @@ ALTER TABLE "MarryUsers" ADD FOREIGN KEY ("married_user") REFERENCES "Users" ("i
 
 -- ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "roll_count" INT DEFAULT 0;
 -- ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "roll_timestamp" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;
--- COMMIT;
+COMMIT;
