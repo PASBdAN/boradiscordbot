@@ -227,7 +227,7 @@ class Datefake(commands.Cog):
             return await ctx.author.send(f'{member.display_name} já é seu par 💕')
         elif [x for x in pair_invite if x[0] == ctx.author.id]:
             return await ctx.author.send(f'Você já convidou {member.display_name}, aguarde 🥰')
-        elif True in [x[2] for x in pair_invite]:
+        elif True in [x[1] for x in pair_invite]:
             return await ctx.author.send(f'{member.display_name} já tem um par para o evento, você não pode convidá-lo(a) 😔')
         else:
             db = Client('DatefakePartners')
@@ -261,9 +261,9 @@ class Datefake(commands.Cog):
         db.close_db()
         if True in [x[2] for x in user_invites]:
             try:
-                user_display_name = ctx.guild.get_member([x[1] for x in user_invites if x[2]]).display_name
+                user_display_name = ctx.guild.get_member([x[1] for x in user_invites if x[2]][0]).display_name
             except (TypeError, AttributeError):
-                user_display_name = ctx.guild.fetch_member([x[1] for x in user_invites if x[2]]).display_name
+                user_display_name = ctx.guild.fetch_member([x[1] for x in user_invites if x[2]][0]).display_name
             await self.show_participants(ctx, channel)
             await channel.send(f"Você já vai para o evento com 💕 {user_display_name} 💕")
             return await self.delete_channel(ctx, channel)
