@@ -230,7 +230,9 @@ class Datefake(commands.Cog):
             'Deseja convidar este usuário?'
         ))
         if not await self.confirmation_react(ctx,msg):
+            await msg.delete()
             return await ctx.send(f'Ok, o usuário {member.display_name} não foi convidado!')
+        await msg.delete()
         pair_id = member.id
         db = Client('DatefakeUsers')
         select = db.select(user_id = pair_id)
@@ -238,6 +240,10 @@ class Datefake(commands.Cog):
         if not select:
             return await ctx.author.send(f'{member.display_name} não é participante do evento ainda, você não pode convidá-lo(a) 😔')
         db = Client('DatefakePartners')
+        self_invite = db.select('partner_id',datefake_id=ctx.author.id,has_accepted = True)
+        if self_invite:
+            db.close_db()
+            return await ctx.author.send(f'Você já vai ao eventos com {member.display_name}, não pode convidar mais pessoas 🤭')
         pair_invite = db.select('datefake_id','has_accepted','has_refused', partner_id = pair_id)
         db.close_db()
         if [x for x in pair_invite if x[0] == ctx.author.id and x[2]]:
