@@ -212,16 +212,12 @@ class Datefake(commands.Cog):
         brief=f'Ex: b!invite @Flakesu',
         description=f'Convida uma pessoa para ser seu par no Datefake')
     @commands.has_role('Tester')
-    async def _invite(self, ctx, *display_name):
-        display_name = ' '.join(display_name)
+    async def _invite(self, ctx, *member):
         await ctx.message.delete()
-        try:
-            member = discord.utils.get(ctx.guild.members, display_name=display_name)
-        except Exception as e:
-            print(e)
-            member = None
-        if not member:
-            return await ctx.send(f'Usuário {display_name} não foi encontrado, tente escrever exatamente o nickname dele no server.')
+        member = ' '.join(member)
+        member = await commands.converter.MemberConverter().convert(ctx,member)
+        if type(member) != discord.Member:
+            return await ctx.send(f'Usuário {member} não foi encontrado, verifique se tem emojis ou letras maiúsculas no nome do usuário e tente novamente.')
         if member.id == ctx.author.id:
             return await ctx.send('Você não pode convidar você mesmo 💢😡')
         msg = await ctx.send(embed = self.create_embed(
@@ -232,7 +228,7 @@ class Datefake(commands.Cog):
             'Deseja convidar este usuário?'
         ))
         if not await self.confirmation_react(ctx,msg):
-            return await ctx.send(f'Ok, o usuário {display_name} não foi convidado!')
+            return await ctx.send(f'Ok, o usuário {member.display_name} não foi convidado!')
         pair_id = member.id
         db = Client('DatefakeUsers')
         select = db.select(user_id = pair_id)
@@ -322,7 +318,7 @@ class Datefake(commands.Cog):
                     
         # QUARTO PERMITIR QUE O USUÁRIO CONVIDE ALGUEM:
         await self.show_participants(ctx, channel)
-        msg = await channel.send(f"Para convidar alguém que já está participando, execute o comando  b!invite  @crush  mencionando o usuário que deseja convidar 🤩")
+        msg = await channel.send(f"Para convidar alguém que já está participando, execute o comando  b!invite user  escrevendo o nickname, id ou nome#discriminador do usuário que você quer convidar 🤩")
         return await self.delete_channel(ctx, channel)
 
     @commands.command(name='participants',
