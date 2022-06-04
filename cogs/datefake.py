@@ -1,12 +1,12 @@
-from asynchat import simple_producer
-import asyncio
-from dis import disco
+from tkinter import E
 import discord
 from discord import Embed
 from discord.ext import commands
 from datetime import datetime, timezone, timedelta
 from asyncio import sleep
 from database.client import Client
+
+import discord.utils
 
 def dia_tarde_noite():
     timezone_offset = -3.0  # São Paulo (UTC−03:00)
@@ -129,10 +129,14 @@ class Datefake(commands.Cog):
             return True
 
 
-    def create_embed(self, title:str, fields:list, colour, footer = ''):
+    def create_embed(self, title:str, fields:list, colour, image = None, footer = '', thumbnail = None):
         embed = Embed(title=title)
         for name, value, inline in fields:
             embed.add_field(name=name, value=value, inline=inline)
+        if image:
+            embed.set_image(url=image)
+        if thumbnail:
+            embed.set_thumbnail(url=thumbnail)
         embed.colour = colour
         embed.set_footer(text = footer)
         return embed
@@ -209,10 +213,27 @@ class Datefake(commands.Cog):
         brief=f'Ex: b!invite @Flakesu',
         description=f'Convida uma pessoa para ser seu par no Datefake')
     @commands.has_role('Tester')
-    async def _invite(self, ctx, member:discord.Member):
+    async def _invite(self, ctx, *display_name):
+        display_name = ' '.join(display_name)
         await ctx.message.delete()
+        try:
+            member = discord.utils.get(ctx.guild.members, display_name=display_name)
+        except Exception as e:
+            print(e)
+            member = None
+        if not member:
+            return await ctx.send(f'Usuário {display_name} não foi encontrado, tente escrever exatamente o nickname dele no server.')
         if member.id == ctx.author.id:
-            return await ctx.author.send('Você não pode convidar você mesmo 💢😡')
+            return await ctx.send('Você não pode convidar você mesmo 💢😡')
+        msg = await ctx.send(embed = self.create_embed(
+            member.display_name,
+            [],
+            0xff66cc,
+            member.avatar_url,
+            'Deseja convidar este usuário?'
+        ))
+        if not await self.confirmation_react(ctx,msg):
+            return await ctx.send(f'Ok, o usuário {display_name} não foi convidado!')
         pair_id = member.id
         db = Client('DatefakeUsers')
         select = db.select(user_id = pair_id)
