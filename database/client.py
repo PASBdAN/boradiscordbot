@@ -55,7 +55,7 @@ class Client():
         for i in list(range(0,len(values.items())-1)):
             query += sql.SQL('%s, ')
         query += sql.SQL('%s)')
-        
+
         self.cursor.execute(    
             query, tuple([x[1] for x in values.items()])
         )
@@ -95,9 +95,9 @@ class Client():
             )
             if item != list(values.items())[-1]:
                 query += sql.SQL(', ')
-
+        id_column = list(values.items())[0][0]
         query += sql.SQL(' WHERE {pkey} = %s').format(
-            pkey=sql.Identifier('id')
+            pkey=sql.Identifier(str(id_column))
         )
         lista = [x[1] for x in list(values.items())[1:]]
         lista.append(list(values.items())[0][1])

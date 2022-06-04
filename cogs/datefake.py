@@ -1,5 +1,6 @@
 from asynchat import simple_producer
 import asyncio
+from dis import disco
 import discord
 from discord import Embed
 from discord.ext import commands
@@ -173,6 +174,35 @@ class Datefake(commands.Cog):
         if aux:
             return True
         return False
+
+
+    @commands.command(name='undo_pair',
+        brief='Ex: b!undo_pair @Flakesu',
+        description='Desfaz um par e manda uma dm para ambos avisando')
+    @commands.has_permissions(manage_guild=True)
+    async def _undo_pair(self,ctx,member:discord.Member):
+        db = Client('DatefakeUsers')
+        select = db.select(user_id = member.id)
+        db.close_db()
+        if not select:
+            return await ctx.send(f'{member.display_name} não participa do evento.')
+        db = Client('DatefakePartners')
+        select = db.select('id','partner_id',datefake_id=member.id,has_accepted=True)
+        db.close_db()
+        if select:
+            try:
+                pair = ctx.guild.get_member(select[0][1])
+            except (TypeError, AttributeError):
+                pair = ctx.guild.fetch_member(select[0][1])
+            msg = await ctx.send(f'Deseja desfazer o par {member.display_name} x {pair.display_name}?')
+            if await self.confirmation_react(ctx,msg):
+                db = Client('DatefakePartners')
+                db.update_by_id(datefake_id=pair.id,has_accepted=False,has_refused=True)
+                db.update_by_id(datefake_id=member.id,has_accepted=False,has_refused=True)
+                db.close_db()
+                return await ctx.send(f'Par desfeito!')
+            return await ctx.send(f'Ok! O par não foi alterado.')
+        return await ctx.send(f'O usuário {member.display_name} não tem nenhum par.')
 
 
     @commands.command(name='invite',
