@@ -19,6 +19,8 @@ def get_prefix(bot, message):
 intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix=get_prefix,intents=intents)
+
+
 @bot.command(brief=f'Ex: $load Prefixes',
         description='Carrega o módulo especificado.')
 @commands.has_permissions(manage_guild=True)
@@ -30,6 +32,7 @@ async def load(ctx, extension:str):
     except Exception as e:
         message = f"Não foi possível carregar o módulo {extension}:\n{e}"
         await ctx.send(message)
+
 
 @bot.command(brief=f'Ex: $unload Prefixes',
         description='Desativa o módulo especificado.')
@@ -44,6 +47,7 @@ async def unload(ctx, extension:str):
         message = f"Não foi possível desativar o módulo {extension}:\n{e}"
         await ctx.send(message)
 
+
 @bot.command(brief=f'Ex: $reload Prefixes',
         description='Restarta o módulo especificado.')
 @commands.has_permissions(manage_guild=True)
@@ -57,8 +61,11 @@ async def reload(ctx, extension:str):
         message = f"Não foi possível reiniciar o módulo {extension}:\n{e}"
         await ctx.send(message)
 
+Client().create_schema()
+
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
+
 
 bot.run(BOT_KEY)

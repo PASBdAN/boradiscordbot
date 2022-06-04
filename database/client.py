@@ -5,15 +5,15 @@ from manage import dict_config
 DATABASE_URL = dict_config['DATABASE_URL']
 
 class Client():
-    def __init__(self, tb_name):
+    def __init__(self, tb_name = ""):
         self.conn = psycopg2.connect(DATABASE_URL)
         self.cursor = self.conn.cursor()
-        self.schema_file = 'database/schemas/tables_schemas.sql'
-        with open(self.schema_file, 'r') as f:
-            schema = f.read()
-            self.cursor.execute(schema)
         self.tb_name = tb_name
 
+    def create_schema(self):
+        with open('database/schemas/tables_schemas.sql', 'r') as f:
+            schema = f.read()
+            self.cursor.execute(schema)
 
     def select(self, *columns, **filters):
         if columns:
@@ -55,7 +55,7 @@ class Client():
         for i in list(range(0,len(values.items())-1)):
             query += sql.SQL('%s, ')
         query += sql.SQL('%s)')
-
+        
         self.cursor.execute(    
             query, tuple([x[1] for x in values.items()])
         )
@@ -67,7 +67,10 @@ class Client():
             table=sql.Identifier(self.tb_name)
         )
         if not filters:
-            return query
+            self.cursor.execute(
+                query, tuple([x[1] for x in filters.items()])
+            )
+            return self.commit_db()
         query += sql.SQL(' WHERE ')
         for item in filters.items():
             query += sql.SQL('{field} = %s').format(
@@ -112,6 +115,5 @@ class Client():
     def close_db(self):
         if self.conn:
             self.conn.close()
-            # print("Sessão finalizada")
 
         

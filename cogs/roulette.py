@@ -69,7 +69,7 @@ class Roulette(commands.Cog):
     # COMMANDS
     @commands.command(
         name='roll',
-        brief=f'Ex: $roll',
+        brief=f'Ex: b!roll',
         description='Retorna uma embed message interagível por reactions de um usuário do servidor')
     @commands.has_permissions(manage_guild=True)
     async def _roll(self, ctx):
@@ -92,9 +92,7 @@ class Roulette(commands.Cog):
 
         msg = await ctx.send(embed = self.create_embed(
             member.name,
-            [
-                ("Cargo: ",greater_role.name,False),
-            ],
+            [("Cargo: ",greater_role.name,False),],
             member.avatar_url,
             0xff66cc, married_message))
         if is_married:
@@ -107,7 +105,7 @@ class Roulette(commands.Cog):
 
     @commands.command(
         name='mylist',
-        brief=f'Ex: $mylist',
+        brief=f'Ex: b!mylist',
         description='Retorna a sua listinha!')
     @commands.has_permissions(manage_guild=True)
     async def _mylist(self, ctx):

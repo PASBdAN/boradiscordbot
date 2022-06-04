@@ -38,7 +38,7 @@ class Main(commands.Cog):
         print(members_list)
         for member in members_list:
             try:
-                aux = db.insert(id=member.id,name=member.name,nickname=member.display_name,created_at=datetime.now(timezone.utc))
+                db.insert(id=member.id,display_name=member.display_name,created_at=datetime.now(timezone.utc))
             except Exception as e:
                 db.conn.rollback()
                 print(e)
@@ -82,7 +82,7 @@ class Main(commands.Cog):
     # COMMANDS
     @commands.command(
         name="prefix",
-        brief=f'Ex: $prefix !',
+        brief=f'Ex: b!prefix !',
         description='Troca o prefixo dos comandos do bot.')
     @commands.has_permissions(manage_guild=True)
     async def _prefix(self, ctx, prefix):
