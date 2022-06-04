@@ -242,8 +242,12 @@ class Datefake(commands.Cog):
         db = Client('DatefakePartners')
         self_invite = db.select('partner_id',datefake_id=ctx.author.id,has_accepted = True)
         if self_invite:
+            try:
+                user_display_name = ctx.guild.get_member(self_invite[0][0]).display_name
+            except (TypeError, AttributeError):
+                user_display_name = ctx.guild.fetch_member(self_invite[0][0]).display_name
             db.close_db()
-            return await ctx.author.send(f'Você já vai ao eventos com {member.display_name}, não pode convidar mais pessoas 🤭')
+            return await ctx.author.send(f'Você já vai ao eventos com {user_display_name}, não pode convidar mais pessoas 🤭')
         pair_invite = db.select('datefake_id','has_accepted','has_refused', partner_id = pair_id)
         db.close_db()
         if [x for x in pair_invite if x[0] == ctx.author.id and x[2]]:
