@@ -64,7 +64,7 @@ class Roulette(commands.Cog):
         name='roll',
         brief=f'Ex: b!roll',
         description='Retorna uma embed message interagível por reactions de um usuário do servidor')
-    @commands.has_permissions(manage_guild=True)
+    # @commands.has_permissions(manage_guild=True)
     @commands.has_role('Tester')
     async def _roll(self, ctx):
         author = self.members_dict[ctx.author.id]
@@ -120,7 +120,7 @@ class Roulette(commands.Cog):
         name='mylist',
         brief=f'Ex: b!mylist',
         description='Retorna a sua listinha!')
-    @commands.has_permissions(manage_guild=True)
+    # @commands.has_permissions(manage_guild=True)
     @commands.has_role('Tester')
     async def _mylist(self, ctx):
         db = Client('MarryUsers')
