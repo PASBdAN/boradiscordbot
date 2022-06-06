@@ -35,7 +35,6 @@ class Main(commands.Cog):
     async def on_ready(self):
         db = Client('Users')
         members_list = [x for x in self.bot.get_all_members()]
-        print(members_list)
         for member in members_list:
             try:
                 db.insert(id=member.id,display_name=member.display_name,created_at=datetime.now(timezone.utc))

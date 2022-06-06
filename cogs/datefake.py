@@ -31,22 +31,6 @@ class Datefake(commands.Cog):
         print(f'Módulo {self.module_name} pronto!')
 
 
-    async def delete_channel(self, ctx, channel, time = 60, can_cancel = False):
-        if not can_cancel:
-            await channel.send(f"Este canal será deletado em {time} segundos! {dia_tarde_noite().capitalize()}!")
-            await sleep(time)
-            await channel.delete()
-            await channel.category.delete()
-        else:
-            msg = await channel.send(f"Este canal será deletado em {time} segundos! Deseja cancelar?")
-            if await self.confirmation_react(ctx, msg, lambda : True, timeout=float(time)):
-                await channel.send(f"O canal não será mais deletado! {dia_tarde_noite().capitalize()}!")
-                return None
-            await channel.delete()
-            await channel.category.delete()
-        return True
-
-
     async def confirmation_react(self, ctx, msg:discord.message, timeout = 30.0, allow_skip = False):
         accept =  "✅"
         decline = "❌"
@@ -98,9 +82,24 @@ class Datefake(commands.Cog):
         }
         for role in guild.roles:
             overwrites[role] = discord.PermissionOverwrite(read_messages=False)
-        category = await guild.create_category(f'datefake_{member}', overwrites=overwrites)
-        return await guild.create_text_channel(f'private_chat', overwrites=overwrites, category = category)
+        # category = await guild.create_category(f'datefake_{member}', overwrites=overwrites)
+        return await guild.create_text_channel(f'private_chat', overwrites=overwrites)#, category = category)
 
+
+    async def delete_channel(self, ctx, channel, time = 60, can_cancel = False):
+        if not can_cancel:
+            await channel.send(f"Este canal será deletado em {time} segundos! {dia_tarde_noite().capitalize()}!")
+            await sleep(time)
+            await channel.delete()
+            # await channel.category.delete()
+        else:
+            msg = await channel.send(f"Este canal será deletado em {time} segundos! Deseja cancelar?")
+            if await self.confirmation_react(ctx, msg, lambda : True, timeout=float(time)):
+                await channel.send(f"O canal não será mais deletado! {dia_tarde_noite().capitalize()}!")
+                return None
+            await channel.delete()
+            # await channel.category.delete()
+        return True
 
     async def add_user_to_pool(self, ctx, channel):
         db = Client('DatefakeUsers')
@@ -179,6 +178,14 @@ class Datefake(commands.Cog):
         return False
 
 
+    '''@commands.command(name='shuffle',
+        brief='Ex: b!shuffle',
+        description='Gera os pares com os participantes do shuffle')
+    @commands.has_permissions(manage_guild=True)
+    async def _shuffle(self,ctx):
+        db = Client('DatefakeUsers')'''
+
+
     @commands.command(name='undo_pair',
         brief='Ex: b!undo_pair @Flakesu',
         description='Desfaz um par e manda uma dm para ambos avisando')
@@ -209,9 +216,8 @@ class Datefake(commands.Cog):
 
 
     @commands.command(name='invite',
-        brief=f'Ex: b!invite @Flakesu',
+        brief=f'Ex: b!invite Flakesu',
         description=f'Convida uma pessoa para ser seu par no Datefake')
-    @commands.has_role('Tester')
     async def _invite(self, ctx, *member):
         await ctx.message.delete()
         member = ' '.join(member)
@@ -268,7 +274,6 @@ class Datefake(commands.Cog):
     @commands.command(name='datefake',
         brief=f'Ex: b!datefake',
         description='Cria um chat privado')
-    @commands.has_role('Tester')
     async def _datefake(self, ctx):
         # CRIANDO O CANAL PRIVADO:
         event_name = "Datefake"
