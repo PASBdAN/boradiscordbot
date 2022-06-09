@@ -4,6 +4,7 @@ from discord.ext import commands
 from datetime import datetime, timezone, timedelta
 from asyncio import sleep
 from database.client import Client
+import asyncio
 
 import discord.utils
 
@@ -139,16 +140,102 @@ class Datefake(commands.Cog):
         embed.set_footer(text = footer)
         return embed
 
+    async def next_page(self, ctx, datefake_users, pages, pagination, invites, msg):
+        current_page = 0
+        left = "⬅️"
+        right = "➡️"
+        await msg.add_reaction(left)
+        await msg.add_reaction(right)
+        def check(reaction, user):
+            return user == ctx.author and str(
+                reaction.emoji) in [left, right] and reaction.message == msg
+                
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                if str(reaction.emoji) == left:
+                    print('left')
+                    if current_page <= 0:
+                        current_page = len(datefake_users)/pagination - 1
+                        if str(current_page).split('.')[1] != '0':
+                            current_page = int(current_page) + 1
+                        else:
+                            current_page = int(current_page)
+                    else:
+                        current_page -= 1
+                    print(current_page)
+                    participants_output = ''
+                    status_output = ''
+                    print(f'{current_page*pagination}:{(current_page+1)*pagination}')
+                    for user in datefake_users[current_page*pagination:(current_page+1)*pagination]:
+                        # print(user)
+                        user_invites = [x for x in invites if x[0] == user[0]]
+                        invite_output = f'Participando do shuffle, recebeu {len(user_invites)} {"convites" if len(user_invites) != 1 else "convite"} 🌷\n' if len(user_invites) else f'Participando do shuffle 💚\n'
+                        try:
+                            user_display_name = ctx.guild.get_member(user[0]).display_name
+                        except (TypeError, AttributeError):
+                            user_display_name = ctx.guild.fetch_member(user[0]).display_name
+                        participants_output += f'{user_display_name}\n'
+                        status_output += 'Já tem um par 💕\n' if True in [x[1] for x in user_invites] else invite_output
+                    print(participants_output)
+                    print(status_output)
+                    await msg.edit(embed = self.create_embed(
+                        title=f'Total de participantes: {len(datefake_users)}',
+                        fields=[('Participantes',participants_output,True),('Status',status_output,True)],
+                        colour=0xff66cc,
+                        footer=f'Página {(current_page) + 1}/{pages}'))
+
+                if str(reaction.emoji) == right:
+                    print('right')
+                    if current_page*pagination >= len(datefake_users) - pagination:
+                        current_page = 0
+                    else:
+                        current_page += 1
+
+                    participants_output = ''
+                    status_output = ''
+                    
+                    for user in datefake_users[current_page*pagination:(current_page+1)*pagination]:
+                        user_invites = [x for x in invites if x[0] == user[0]]
+                        invite_output = f'Participando do shuffle, recebeu {len(user_invites)} {"convites" if len(user_invites) != 1 else "convite"} 🌷\n' if len(user_invites) else f'Participando do shuffle 💚\n'
+                        try:
+                            user_display_name = ctx.guild.get_member(user[0]).display_name
+                        except (TypeError, AttributeError):
+                            user_display_name = ctx.guild.fetch_member(user[0]).display_name
+                        participants_output += f'{user_display_name}\n'
+                        status_output += 'Já tem um par 💕\n' if True in [x[1] for x in user_invites] else invite_output
+
+                    await msg.edit(embed = self.create_embed(
+                        title=f'Total de participantes: {len(datefake_users)}',
+                        fields=[('Participantes',participants_output,True),('Status',status_output,True)],
+                        colour=0xff66cc,
+                        footer=f'Página {(current_page) + 1}/{pages}'))
+
+            except asyncio.TimeoutError:
+                break
+
     async def show_participants(self, ctx, channel = None):
         db = Client('DatefakeUsers')
         datefake_users = db.select('user_id')
         db.tb_name = 'DatefakePartners'
         invites = db.select('partner_id','has_accepted')
         db.close_db()
+
         participants_output = ''
         status_output = ''
-        for user in datefake_users:
-            user_invites = [x for x in invites if x[0] == user[0] and x[1]]
+
+        pagination = 20
+        pages = len(datefake_users)/pagination
+        if str(pages).split('.')[1] != '0':
+            pages = int(pages) + 1
+        else:
+            pages = int(pages)
+        print(pages)
+        print(pagination, len(datefake_users))
+        current_page = 0
+
+        for user in datefake_users[current_page*pagination:(current_page+1)*pagination]:
+            user_invites = [x for x in invites if x[0] == user[0]]
             invite_output = f'Participando do shuffle, recebeu {len(user_invites)} {"convites" if len(user_invites) != 1 else "convite"} 🌷\n' if len(user_invites) else f'Participando do shuffle 💚\n'
             try:
                 user_display_name = ctx.guild.get_member(user[0]).display_name
@@ -158,48 +245,18 @@ class Datefake(commands.Cog):
             status_output += 'Já tem um par 💕\n' if True in [x[1] for x in user_invites] else invite_output
 
         embed = self.create_embed(
-            # title=f'Total: {len(datefake_users)}',
-            title='',
+            title=f'Total de participantes: {len(datefake_users)}',
             fields=[('Participantes',participants_output,True),('Status',status_output,True)],
             colour=0xff66cc,
-            footer=f'Total: {len(datefake_users)}'
+            footer=f'Página {(current_page) + 1}/{pages}'
         )
 
         if channel:
-            await channel.send(embed = embed)
-        await ctx.send(embed = embed)
-
-        participants_output = ''
-        status_output = ''
-        for user in datefake_users:
-            user_invites = [x for x in invites if x[0] == user[0] and not x[1]]
-            invite_output = f'Participando do shuffle, recebeu {len(user_invites)} {"convites" if len(user_invites) != 1 else "convite"} 🌷\n' if len(user_invites) else f'Participando do shuffle 💚\n'
-            try:
-                user_display_name = ctx.guild.get_member(user[0]).display_name
-            except (TypeError, AttributeError):
-                user_display_name = ctx.guild.fetch_member(user[0]).display_name
-            participants_output += f'{user_display_name}\n'
-            status_output += 'Já tem um par 💕\n' if True in [x[1] for x in user_invites] else invite_output
-
-        embed = self.create_embed(
-            # title=f'Total: {len(datefake_users)}',
-            title='',
-            fields=[('Participantes',participants_output,True),('Status',status_output,True)],
-            colour=0xff66cc,
-            footer=f'Total: {len(datefake_users)}'
-        )
-
-        embed = self.create_embed(
-            # title=f'Total: {len(datefake_users)}',
-            title='',
-            fields=[('Participantes',participants_output,True),('Status',status_output,True)],
-            colour=0xff66cc,
-            footer=f'Total: {len(datefake_users)}'
-        )
-
-        if channel:
-            return await channel.send(embed = embed)
-        return await ctx.send(embed = embed)
+            msg = await channel.send(embed = embed)
+        else:
+            msg = await ctx.send(embed = embed)
+        if pagination < len(datefake_users):
+            asyncio.ensure_future(self.next_page(ctx,datefake_users,pages,pagination,invites,msg))
 
 
     async def check_participation(self, ctx):
