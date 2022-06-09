@@ -435,8 +435,11 @@ class Datefake(commands.Cog):
                         else:
                             db.insert(datefake_id=ctx.author.id,partner_id=user.id,has_accepted=True,has_refused=False, created_at = datetime.now(timezone.utc))
                         db.close_db()
-                        await user.send(f'{ctx.author.display_name} aceitou seu convite 💑')
-                        await channel.send(f'{user.display_name} foi notificado via DM que você aceitou o convite. Divirtam-se 🥰')
+                        try:
+                            await user.send(f'{ctx.author.display_name} aceitou seu convite 💑')
+                            await channel.send(f'{user.display_name} foi notificado via DM que você aceitou o convite. Divirtam-se 🥰')
+                        except:
+                            await channel.send(f' {user.display_name} desabilitou DMs do server então não pude notifica-lo(a) do aceite, mas os dois já são pares. Divirtam-se 🥰')
                         await self.show_participants(ctx, channel)
                         return await self.delete_channel(ctx, channel)
                     elif react == False:
