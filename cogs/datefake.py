@@ -169,7 +169,7 @@ class Datefake(commands.Cog):
                     print(f'{current_page*pagination}:{(current_page+1)*pagination}')
                     for user in datefake_users[current_page*pagination:(current_page+1)*pagination]:
                         # print(user)
-                        user_invites = [x for x in invites if x[0] == user[0]]
+                        user_invites = [x for x in invites if x[0] == user[0] and not x[2]]
                         invite_output = f'Participando do shuffle, recebeu {len(user_invites)} {"convites" if len(user_invites) != 1 else "convite"} 🌷\n' if len(user_invites) else f'Participando do shuffle 💚\n'
                         try:
                             user_display_name = ctx.guild.get_member(user[0]).display_name
@@ -196,7 +196,7 @@ class Datefake(commands.Cog):
                     status_output = ''
                     
                     for user in datefake_users[current_page*pagination:(current_page+1)*pagination]:
-                        user_invites = [x for x in invites if x[0] == user[0]]
+                        user_invites = [x for x in invites if x[0] == user[0] and not x[2]]
                         invite_output = f'Participando do shuffle, recebeu {len(user_invites)} {"convites" if len(user_invites) != 1 else "convite"} 🌷\n' if len(user_invites) else f'Participando do shuffle 💚\n'
                         try:
                             user_display_name = ctx.guild.get_member(user[0]).display_name
@@ -218,7 +218,7 @@ class Datefake(commands.Cog):
         db = Client('DatefakeUsers')
         datefake_users = db.select('user_id')
         db.tb_name = 'DatefakePartners'
-        invites = db.select('partner_id','has_accepted')
+        invites = db.select('partner_id','has_accepted', 'has_refused')
         db.close_db()
 
         participants_output = ''
@@ -235,7 +235,7 @@ class Datefake(commands.Cog):
         current_page = 0
 
         for user in datefake_users[current_page*pagination:(current_page+1)*pagination]:
-            user_invites = [x for x in invites if x[0] == user[0]]
+            user_invites = [x for x in invites if x[0] == user[0] and not x[2]]
             invite_output = f'Participando do shuffle, recebeu {len(user_invites)} {"convites" if len(user_invites) != 1 else "convite"} 🌷\n' if len(user_invites) else f'Participando do shuffle 💚\n'
             try:
                 user_display_name = ctx.guild.get_member(user[0]).display_name
