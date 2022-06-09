@@ -148,7 +148,7 @@ class Datefake(commands.Cog):
         participants_output = ''
         status_output = ''
         for user in datefake_users:
-            user_invites = [x for x in invites if x[0] == user[0]]
+            user_invites = [x for x in invites if x[0] == user[0] and x[1]]
             invite_output = f'Participando do shuffle, recebeu {len(user_invites)} {"convites" if len(user_invites) != 1 else "convite"} 🌷\n' if len(user_invites) else f'Participando do shuffle 💚\n'
             try:
                 user_display_name = ctx.guild.get_member(user[0]).display_name
@@ -164,6 +164,39 @@ class Datefake(commands.Cog):
             colour=0xff66cc,
             footer=f'Total: {len(datefake_users)}'
         )
+
+        if channel:
+            await channel.send(embed = embed)
+        await ctx.send(embed = embed)
+
+        participants_output = ''
+        status_output = ''
+        for user in datefake_users:
+            user_invites = [x for x in invites if x[0] == user[0] and not x[1]]
+            invite_output = f'Participando do shuffle, recebeu {len(user_invites)} {"convites" if len(user_invites) != 1 else "convite"} 🌷\n' if len(user_invites) else f'Participando do shuffle 💚\n'
+            try:
+                user_display_name = ctx.guild.get_member(user[0]).display_name
+            except (TypeError, AttributeError):
+                user_display_name = ctx.guild.fetch_member(user[0]).display_name
+            participants_output += f'{user_display_name}\n'
+            status_output += 'Já tem um par 💕\n' if True in [x[1] for x in user_invites] else invite_output
+
+        embed = self.create_embed(
+            # title=f'Total: {len(datefake_users)}',
+            title='',
+            fields=[('Participantes',participants_output,True),('Status',status_output,True)],
+            colour=0xff66cc,
+            footer=f'Total: {len(datefake_users)}'
+        )
+
+        embed = self.create_embed(
+            # title=f'Total: {len(datefake_users)}',
+            title='',
+            fields=[('Participantes',participants_output,True),('Status',status_output,True)],
+            colour=0xff66cc,
+            footer=f'Total: {len(datefake_users)}'
+        )
+
         if channel:
             return await channel.send(embed = embed)
         return await ctx.send(embed = embed)
