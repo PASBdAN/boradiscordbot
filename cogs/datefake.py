@@ -334,7 +334,10 @@ class Datefake(commands.Cog):
         select = db.select(user_id = pair_id)
         db.close_db()
         if not select:
-            return await ctx.author.send(f'{member.display_name} não é participante do evento ainda, você não pode convidá-lo(a) 😔')
+            try:
+                return await ctx.author.send(f'{member.display_name} não é participante do evento ainda, você não pode convidá-lo(a) 😔')
+            except:
+                return await ctx.send(f'{member.display_name} não é participante do evento ainda, você não pode convidá-lo(a) 😔')
         db = Client('DatefakePartners')
         self_invite = db.select('partner_id',datefake_id=ctx.author.id,has_accepted = True)
         if self_invite:
@@ -343,22 +346,40 @@ class Datefake(commands.Cog):
             except (TypeError, AttributeError):
                 user_display_name = ctx.guild.fetch_member(self_invite[0][0]).display_name
             db.close_db()
-            return await ctx.author.send(f'Você já vai ao eventos com {user_display_name}, não pode convidar mais pessoas 🤭')
+            try:
+                return await ctx.author.send(f'Você já vai ao eventos com {user_display_name}, não pode convidar mais pessoas 🤭')
+            except:
+                return await ctx.send(f'Você já vai ao eventos com {user_display_name}, não pode convidar mais pessoas 🤭')
         pair_invite = db.select('datefake_id','has_accepted','has_refused', partner_id = pair_id)
         db.close_db()
         if [x for x in pair_invite if x[0] == ctx.author.id and x[2]]:
-            return await ctx.author.send(f'{member.display_name} já recusou seu convite, você não pode convidá-lo(a) de novo 😔')
+            try:
+                return await ctx.author.send(f'{member.display_name} já recusou seu convite, você não pode convidá-lo(a) de novo 😔')
+            except:
+                return await ctx.send(f'Você já vai ao eventos com {user_display_name}, não pode convidar mais pessoas 🤭')
         elif [x for x in pair_invite if x[0] == ctx.author.id and x[1]]:
-            return await ctx.author.send(f'{member.display_name} já é seu par 💕')
+            try:
+                return await ctx.author.send(f'{member.display_name} já é seu par 💕')
+            except:
+                return await ctx.send(f'{member.display_name} já é seu par 💕')
         elif [x for x in pair_invite if x[0] == ctx.author.id]:
-            return await ctx.author.send(f'Você já convidou {member.display_name}, aguarde 🥰')
+            try:
+                return await ctx.author.send(f'Você já convidou {member.display_name}, aguarde 🥰')
+            except:
+                return await ctx.send(f'Você já convidou {member.display_name}, aguarde 🥰')
         elif True in [x[1] for x in pair_invite]:
-            return await ctx.author.send(f'{member.display_name} já tem um par para o evento, você não pode convidá-lo(a) 😔')
+            try:
+                return await ctx.author.send(f'{member.display_name} já tem um par para o evento, você não pode convidá-lo(a) 😔')
+            except:
+                return await ctx.send(f'{member.display_name} já tem um par para o evento, você não pode convidá-lo(a) 😔')
         else:
             db = Client('DatefakePartners')
             db.insert(datefake_id = ctx.author.id, partner_id = pair_id, has_accepted = False, has_refused = False, created_at = datetime.now(timezone.utc))
             db.close_db()
-            return await ctx.author.send(f'Você enviou um convite para {member.display_name}, agora é só aguardar 🥰')
+            try: 
+                return await ctx.author.send(f'Você enviou um convite para {member.display_name}, agora é só aguardar 🥰')
+            except:
+                return await ctx.send(f'Você enviou um convite para {member.display_name}, agora é só aguardar 🥰')
 
 
     @commands.command(name='datefake',
