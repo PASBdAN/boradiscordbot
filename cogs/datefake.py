@@ -395,7 +395,7 @@ class Datefake(commands.Cog):
         # PRIMEIRO VERIFICAR SE O USUÁRIO JÁ ESTÁ PARTICIPANDO DO EVENTO:
         if not await self.check_participation(ctx):
             db = Client('DatefakeUsers')
-            participants = db.select('id')
+            participants = db.select()
             db.close_db()
             if len(participants) >= 60:
                 msg = await channel.send(f"Sinto muito, o evento já está na máxima capacidade de participantes 😔")
