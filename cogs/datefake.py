@@ -1,3 +1,4 @@
+from turtle import left
 import discord
 from discord import Embed
 from discord.ext import commands
@@ -381,36 +382,29 @@ class Datefake(commands.Cog):
             lista.append(partners_dict[key])
         return lista
 
-    async def random_pairs(self, members):
+    async def random_pairs(self, members) -> list:
         nomes = [x.display_name for x in members]
         random.shuffle(nomes)
-        output = ""
         i = 0
-        bigger_name = nomes[0]
-        for nome in nomes[1:]:
-            if len(nome) > len(bigger_name):
-                bigger_name = nome
+        left_output = ''
+        right_output = ''
         while i <= len(nomes)-2:
-            lenght_left = len(bigger_name) - len(nomes[i])
-            lenght_right = len(bigger_name) - len(nomes[i+1])
-            output += f"\n{nomes[i]}{' '*lenght_left}💚{' '*lenght_right}{nomes[i+1]}"
+            left_output += f'\n{nomes[i]}'
+            right_output += f'\n{nomes[i+1]}'
             i += 2
-        return output
+        return left_output, right_output
 
     async def pairs(self, members):
         nomes = [x.display_name for x in members]
         output = ""
         i = 0
-        bigger_name = nomes[0]
-        for nome in nomes[1:]:
-            if len(nome) > len(bigger_name):
-                bigger_name = nome
+        left_output = ''
+        right_output = ''
         while i <= len(nomes)-2:
-            lenght_left = len(bigger_name) - len(nomes[i])
-            lenght_right = len(bigger_name) - len(nomes[i+1])
-            output += f"\n{nomes[i]}{' '*lenght_left}💚{' '*lenght_right}{nomes[i+1]}"
+            left_output += f'\n{nomes[i]}'
+            right_output += f'\n{nomes[i+1]}'
             i += 2
-        return output
+        return left_output, right_output
 
     @commands.command(name='shuffle',
         brief=f'Ex: b!shuffle',
@@ -440,10 +434,29 @@ class Datefake(commands.Cog):
             except (TypeError, AttributeError):
                 member = await ctx.guild.fetch_member(id)
             pairs_members.append(member)
-        await ctx.send('Os pares randômicos do shuffle são:')
-        await ctx.send(await self.random_pairs(shuffle_members))
-        await ctx.send('Os pares formados são:')
-        await ctx.send(await self.pairs(pairs_members))
+
+        shuffle_left, shuffle_right = await self.random_pairs(shuffle_members)
+        embed = self.create_embed(
+            title=f'Pares gerados do shuffle',
+            fields=[
+                (f"💞{' '*22}💑{' '*22}💞",shuffle_left,True),
+                (f"💞{' '*22}💑{' '*22}💞",shuffle_right,True)],
+            colour=0xff66cc
+            # footer=f'Página {(current_page) + 1}/{pages}'
+        )
+        await ctx.send(embed = embed)
+
+        pairs_left, pairs_right = await self.pairs(pairs_members)
+        embed = self.create_embed(
+            title=f'Pares formados por invites',
+            fields=[
+                (f"💞{' '*22}💑{' '*22}💞",pairs_left,True),
+                (f"💞{' '*22}💑{' '*22}💞",pairs_right,True)
+            ],
+            colour=0xff66cc
+            # footer=f'Página {(current_page) + 1}/{pages}'
+        )
+        await ctx.send(embed = embed)
 
     @commands.command(name='datefake',
         brief=f'Ex: b!datefake',
