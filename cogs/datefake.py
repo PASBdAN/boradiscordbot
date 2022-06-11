@@ -5,6 +5,7 @@ from datetime import datetime, timezone, timedelta
 from asyncio import sleep
 from database.client import Client
 import asyncio
+import random
 
 import discord.utils
 
@@ -174,7 +175,7 @@ class Datefake(commands.Cog):
                         try:
                             user_display_name = ctx.guild.get_member(user[0]).display_name
                         except (TypeError, AttributeError):
-                            user_display_name = ctx.guild.fetch_member(user[0]).display_name
+                            user_display_name = await ctx.guild.fetch_member(user[0]).display_name
                         participants_output += f'{user_display_name}\n'
                         status_output += 'Já tem um par 💕\n' if True in [x[1] for x in user_invites] else invite_output
                     print(participants_output)
@@ -201,7 +202,7 @@ class Datefake(commands.Cog):
                         try:
                             user_display_name = ctx.guild.get_member(user[0]).display_name
                         except (TypeError, AttributeError):
-                            user_display_name = ctx.guild.fetch_member(user[0]).display_name
+                            user_display_name = await ctx.guild.fetch_member(user[0]).display_name
                         participants_output += f'{user_display_name}\n'
                         status_output += 'Já tem um par 💕\n' if True in [x[1] for x in user_invites] else invite_output
 
@@ -240,7 +241,7 @@ class Datefake(commands.Cog):
             try:
                 user_display_name = ctx.guild.get_member(user[0]).display_name
             except (TypeError, AttributeError):
-                user_display_name = ctx.guild.fetch_member(user[0]).display_name
+                user_display_name = await ctx.guild.fetch_member(user[0]).display_name
             participants_output += f'{user_display_name}\n'
             status_output += 'Já tem um par 💕\n' if True in [x[1] for x in user_invites] else invite_output
 
@@ -268,14 +269,6 @@ class Datefake(commands.Cog):
         return False
 
 
-    '''@commands.command(name='shuffle',
-        brief='Ex: b!shuffle',
-        description='Gera os pares com os participantes do shuffle')
-    @commands.has_permissions(manage_guild=True)
-    async def _shuffle(self,ctx):
-        db = Client('DatefakeUsers')'''
-
-
     @commands.command(name='undo_pair',
         brief='Ex: b!undo_pair @Flakesu',
         description='Desfaz um par e manda uma dm para ambos avisando')
@@ -293,7 +286,7 @@ class Datefake(commands.Cog):
             try:
                 pair = ctx.guild.get_member(select[0][1])
             except (TypeError, AttributeError):
-                pair = ctx.guild.fetch_member(select[0][1])
+                pair = await ctx.guild.fetch_member(select[0][1])
             msg = await ctx.send(f'Deseja desfazer o par {member.display_name} x {pair.display_name}?')
             if await self.confirmation_react(ctx,msg):
                 db = Client('DatefakePartners')
@@ -344,7 +337,7 @@ class Datefake(commands.Cog):
             try:
                 user_display_name = ctx.guild.get_member(self_invite[0][0]).display_name
             except (TypeError, AttributeError):
-                user_display_name = ctx.guild.fetch_member(self_invite[0][0]).display_name
+                user_display_name = await ctx.guild.fetch_member(self_invite[0][0]).display_name
             db.close_db()
             try:
                 return await ctx.author.send(f'Você já vai ao eventos com {user_display_name}, não pode convidar mais pessoas 🤭')
@@ -381,6 +374,64 @@ class Datefake(commands.Cog):
             except:
                 return await ctx.send(f'Você enviou um convite para {member.display_name}, agora é só aguardar 🥰')
 
+    def get_partners(self, partners_dict:dict) -> list:
+        lista = []
+        for key in list(partners_dict.keys())[::2]:
+            lista.append(key)
+            lista.append(partners_dict[key])
+        return lista
+
+    async def random_pairs(self, members):
+        nomes = [x.mention for x in members]
+        random.shuffle(nomes)
+        output = ""
+        i = 0
+        while i <= len(nomes)-2:
+            output += f"\n{nomes[i]} \U00002764 {nomes[i+1]}"
+            i += 2
+        return output
+        # await ctx.send(output)
+
+    async def pairs(self, members):
+        nomes = [x.mention for x in members]
+        output = ""
+        i = 0
+        while i <= len(nomes)-2:
+            output += f"\n{nomes[i]} \U00002764 {nomes[i+1]}"
+            i += 2
+        return output
+
+    @commands.command(name='shuffle',
+        brief=f'Ex: b!shuffle',
+        description='Cria um chat privado')
+    async def _shuffle(self, ctx):
+        db = Client('DatefakeUsers')
+        datefake_users = db.select('user_id')
+        db.tb_name = 'DatefakePartners'
+        datefake_partners = db.select('datefake_id','partner_id',has_accepted=True)
+        db.close_db()
+
+        shuffle_ids = [x[0] for x in datefake_users if x[0] not in [x[0] for x in datefake_partners]]
+        shuffle_members = []
+        for id in shuffle_ids:
+            try:
+                member = ctx.guild.get_member(id)
+            except (TypeError, AttributeError):
+                member = await ctx.guild.fetch_member(id)
+            shuffle_members.append(member)
+
+        pairs_ids = self.get_partners(dict(datefake_partners))
+        pairs_members = []
+        for id in pairs_ids:
+            try:
+                member = ctx.guild.get_member(id)
+            except (TypeError, AttributeError):
+                member = await ctx.guild.fetch_member(id)
+            pairs_members.append(member)
+        await ctx.send('Os pares randômicos do shuffle são:')
+        await ctx.send(await self.random_pairs(shuffle_members))
+        await ctx.send('Os pares formados são:')
+        await ctx.send(await self.pairs(pairs_members))
 
     @commands.command(name='datefake',
         brief=f'Ex: b!datefake',
@@ -414,7 +465,7 @@ class Datefake(commands.Cog):
             try:
                 user_display_name = ctx.guild.get_member([x[1] for x in user_invites if x[2]][0]).display_name
             except (TypeError, AttributeError):
-                user_display_name = ctx.guild.fetch_member([x[1] for x in user_invites if x[2]][0]).display_name
+                user_display_name = await ctx.guild.fetch_member([x[1] for x in user_invites if x[2]][0]).display_name
             await self.show_participants(ctx, channel)
             await channel.send(f"Você já vai para o evento com 💕 {user_display_name} 💕")
             return await self.delete_channel(ctx, channel)
@@ -428,7 +479,7 @@ class Datefake(commands.Cog):
                     try:
                         user = ctx.guild.get_member(invite[1])
                     except (TypeError, AttributeError):
-                        user = ctx.guild.fetch_member(invite[1])
+                        user = await ctx.guild.fetch_member(invite[1])
                     msg = await channel.send(f'Deseja ir ao evento com {user.display_name}?')
                     react = await self.confirmation_react(ctx,msg,allow_skip=True)
                     if react:
