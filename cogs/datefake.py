@@ -386,8 +386,14 @@ class Datefake(commands.Cog):
         random.shuffle(nomes)
         output = ""
         i = 0
+        bigger_name = nomes[0]
+        for nome in nomes[1:]:
+            if len(nome) > len(bigger_name):
+                bigger_name = nome
         while i <= len(nomes)-2:
-            output += f"\n{nomes[i]}    💚    {nomes[i+1]}"
+            lenght_left = len(bigger_name) - len(nomes[i])
+            lenght_right = len(bigger_name) - len(nomes[i+1])
+            output += f"\n{nomes[i]}{' '*lenght_left}💚{' '*lenght_right}{nomes[i+1]}"
             i += 2
         return output
 
@@ -395,8 +401,14 @@ class Datefake(commands.Cog):
         nomes = [x.display_name for x in members]
         output = ""
         i = 0
+        bigger_name = nomes[0]
+        for nome in nomes[1:]:
+            if len(nome) > len(bigger_name):
+                bigger_name = nome
         while i <= len(nomes)-2:
-            output += f"\n{nomes[i]}    💚    {nomes[i+1]}"
+            lenght_left = len(bigger_name) - len(nomes[i])
+            lenght_right = len(bigger_name) - len(nomes[i+1])
+            output += f"\n{nomes[i]}{' '*lenght_left}💚{' '*lenght_right}{nomes[i+1]}"
             i += 2
         return output
 
