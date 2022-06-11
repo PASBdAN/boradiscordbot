@@ -1,4 +1,3 @@
-from turtle import left
 import discord
 from discord import Embed
 from discord.ext import commands
