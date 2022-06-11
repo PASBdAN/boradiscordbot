@@ -438,9 +438,9 @@ class Datefake(commands.Cog):
         embed = self.create_embed(
             title=f'Pares gerados do shuffle',
             fields=[
-                (f"{'💚'*22}",shuffle_left,True),
-                (f"{'💙'*22}",shuffle_right,True)],
-            colour=0xff66cc
+                (f"{'💚'*11}",shuffle_left,True),
+                (f"{'💙'*11}",shuffle_right,True)],
+            colour=0xf542ad
             # footer=f'Página {(current_page) + 1}/{pages}'
         )
         await ctx.send(embed = embed)
@@ -449,10 +449,10 @@ class Datefake(commands.Cog):
         embed = self.create_embed(
             title=f'Pares formados por invites',
             fields=[
-                (f"{'💚'*22}",pairs_left,True),
-                (f"{'💙'*22}",pairs_right,True)
+                (f"{'💚'*11}",pairs_left,True),
+                (f"{'💙'*11}",pairs_right,True)
             ],
-            colour=0xff66cc
+            colour=0x42b3f5
             # footer=f'Página {(current_page) + 1}/{pages}'
         )
         await ctx.send(embed = embed)
