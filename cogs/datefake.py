@@ -404,6 +404,7 @@ class Datefake(commands.Cog):
     @commands.command(name='shuffle',
         brief=f'Ex: b!shuffle',
         description='Cria um chat privado')
+    @commands.has_permissions(manage_guild=True)
     async def _shuffle(self, ctx):
         db = Client('DatefakeUsers')
         datefake_users = db.select('user_id')
