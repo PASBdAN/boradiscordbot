@@ -387,7 +387,7 @@ class Datefake(commands.Cog):
         output = ""
         i = 0
         while i <= len(nomes)-2:
-            output += f"\n{nomes[i]}    \U00002764    {nomes[i+1]}"
+            output += f"\n{nomes[i]}    💚    {nomes[i+1]}"
             i += 2
         return output
 
@@ -396,7 +396,7 @@ class Datefake(commands.Cog):
         output = ""
         i = 0
         while i <= len(nomes)-2:
-            output += f"\n{nomes[i]}    \U00002764    {nomes[i+1]}"
+            output += f"\n{nomes[i]}    💚    {nomes[i+1]}"
             i += 2
         return output
 
