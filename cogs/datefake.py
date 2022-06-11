@@ -382,22 +382,21 @@ class Datefake(commands.Cog):
         return lista
 
     async def random_pairs(self, members):
-        nomes = [x.mention for x in members]
+        nomes = [x.display_name for x in members]
         random.shuffle(nomes)
         output = ""
         i = 0
         while i <= len(nomes)-2:
-            output += f"\n{nomes[i]} \U00002764 {nomes[i+1]}"
+            output += f"\n{nomes[i]}    \U00002764    {nomes[i+1]}"
             i += 2
         return output
-        # await ctx.send(output)
 
     async def pairs(self, members):
-        nomes = [x.mention for x in members]
+        nomes = [x.display_name for x in members]
         output = ""
         i = 0
         while i <= len(nomes)-2:
-            output += f"\n{nomes[i]} \U00002764 {nomes[i+1]}"
+            output += f"\n{nomes[i]}    \U00002764    {nomes[i+1]}"
             i += 2
         return output
 
