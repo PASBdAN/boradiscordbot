@@ -301,6 +301,7 @@ class Datefake(commands.Cog):
     @commands.command(name='invite',
         brief=f'Ex: b!invite Flakesu',
         description=f'Convida uma pessoa para ser seu par no Datefake')
+    @commands.has_permissions(manage_guild=True)
     async def _invite(self, ctx, *member):
         await ctx.message.delete()
         member = ' '.join(member)
