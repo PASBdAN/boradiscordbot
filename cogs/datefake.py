@@ -460,6 +460,7 @@ class Datefake(commands.Cog):
     @commands.command(name='datefake',
         brief=f'Ex: b!datefake',
         description='Cria um chat privado')
+    @commands.has_permissions(manage_guild=True)
     async def _datefake(self, ctx):
         # CRIANDO O CANAL PRIVADO:
         event_name = "Datefake"
