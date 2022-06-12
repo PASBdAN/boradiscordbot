@@ -301,7 +301,7 @@ class Datefake(commands.Cog):
     @commands.command(name='invite',
         brief=f'Ex: b!invite Flakesu',
         description=f'Convida uma pessoa para ser seu par no Datefake')
-    @commands.has_permissions(manage_guild=True)
+    # @commands.has_permissions(manage_guild=True)
     async def _invite(self, ctx, *member):
         await ctx.message.delete()
         member = ' '.join(member)
@@ -461,7 +461,7 @@ class Datefake(commands.Cog):
     @commands.command(name='datefake',
         brief=f'Ex: b!datefake',
         description='Cria um chat privado')
-    @commands.has_permissions(manage_guild=True)
+    # @commands.has_permissions(manage_guild=True)
     async def _datefake(self, ctx):
         # CRIANDO O CANAL PRIVADO:
         event_name = "Datefake"
